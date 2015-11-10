@@ -211,40 +211,12 @@ mat4 mat4::rotate(float angle, vec4 axis)
 	float c = cos(angle);
 	float mc = 1 - c;
 	float s = sin(angle);
-	mat4 tmp(c + pow(axis.x, 2) * mc, axis.x * axis.y * mc - axis.z * s, axis.x * axis.z * mc + axis.y * s, 0.0f,
-		axis.y * axis.x * mc + axis.z * s, c + pow(axis.y, 2) * mc, axis.y * axis.z * mc - axis.x * s, 0.0f,
-		axis.z * axis.x * mc - axis.y * s, axis.z * axis.y * mc + axis.x * s, c + pow(axis.z, 2) * mc, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f);
-	return tmp * (*this);
+	mat4 tmp(c + pow(axis.x, 2) * mc,			axis.x * axis.y * mc - axis.z * s, axis.x * axis.z * mc + axis.y * s, 0.0f,
+			 axis.y * axis.x * mc + axis.z * s, c + pow(axis.y, 2) * mc,		   axis.y * axis.z * mc - axis.x * s, 0.0f,
+			 axis.z * axis.x * mc - axis.y * s, axis.z * axis.y * mc + axis.x * s, c + pow(axis.z, 2) * mc,			  0.0f,
+			 0.0f,								0.0f,							   0.0f,							  1.0f);
+	return (tmp * (*this)).transpose();
 }
-
-//mat4 mat4::rotate(int axis, float angle)
-//{
-//	angle = PI/180 * angle;
-//	mat4 tmp;
-//	switch (axis)
-//	{
-//		case 0:
-//			tmp = mat4( 1,  0 ,          0,          0,
-//					    0,  cos(angle), -sin(angle), 0,
-//					    0,  sin(angle),  cos(angle), 0,
-//						0,  0,			 0,		  1);
-//			break;
-//		case 1:
-//			tmp = mat4( cos(angle), 0, sin(angle), 0,
-//						0,			1, 0,		   0,
-//					   -sin(angle), 0, cos(angle), 0,
-//						0,			0, 0,		   1);
-//			break;
-//		case 2:
-//			tmp = mat4(cos(angle), -sin(angle), 0, 0,
-//					   sin(angle),  cos(angle), 0, 0,
-//				       0,           0,          1, 0,
-//				       0,           0,          0, 1);
-//			break;
-//	}	
-//	return tmp * (*this);
-//}
 
 mat4 mat4::translation(vec4 & vec)
 {
@@ -253,7 +225,7 @@ mat4 mat4::translation(vec4 & vec)
 	tmp[0][3] = vec.x;
 	tmp[1][3] = vec.y;
 	tmp[2][3] = vec.z;
-	return tmp * (*this);
+	return (tmp * (*this)).transpose();
 }
 
 mat4 mat4::perspective(float fovy, float aspect, float near, float far)
@@ -272,7 +244,7 @@ mat4 mat4::perspective(float fovy, float aspect, float near, float far)
 	tmp[2][2] = -(far + near) / (far - near);
 	tmp[2][3] = -(2 * far * near) / (far - near);
 	tmp[3][2] = -1;
-	return tmp * (*this);
+	return (tmp * (*this)).transpose();
 }
 
 string mat4::str()

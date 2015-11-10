@@ -16,7 +16,10 @@ GLuint VAO;
 GLuint VBO;
 GLuint attr_location;
 GLuint mvp_location;
-Camera  camera(45.0f, 800, 600, 0.1f, 500.0f);
+int win_width = 1080;
+int win_height = 1920;
+Camera  camera(45.0f, win_height, win_width, 0.1f, 500.0f);
+
 
 const int count_vertices = 806;
 float vertices[count_vertices * 3]; 
@@ -75,14 +78,14 @@ void add_vertex(int i, float x, float y, float z)
 void gen_grid()
 {	
 	int j = 0;
-	for (int i = -1000; i <= 1000; i += 10, j += 4)
+	for (int i = -0; i <= 2000; i += 10, j += 4)
 	{
 		add_vertex(j, i, 0, -1000);
 		add_vertex(j + 1, i, 0, 1000);
 		add_vertex(j + 2, -1000, 0, i);
 		add_vertex(j + 3, 1000, 0, i);
 	}
-	add_vertex(j, 0, -1000, 0);
+	add_vertex(j, 0, 0, 0);
 	add_vertex(j + 1, 0, 1000, 0);
 }
 
@@ -95,10 +98,6 @@ void render()
 	model.identity();
 	view.identity();
 	projection.identity();
-	//model = model.rotate(1, b);
-	//model = model.rotate(0, 2*b);
-	//model = model.rotate(0, -15.0f);
-	//model = model.rotate(1, 10.0f);
 	model = model.rotate(b * 10.0f, vec4(0.5f, 1.0f, 0.0f));
 	b += 0.05;
 	view = view.translation(vec4(0.0f, 0.0f, -3.0f));
@@ -139,6 +138,7 @@ void render()
 	//b += 0.04;
 	//mvp = mvp.translation(vec4(0, 0.25, 0));
 
+
 	mvp_location = glGetUniformLocation(program, "mvp");
 
 	//glm::mat4 trans;
@@ -153,42 +153,60 @@ void render()
 
 void PressKeys(unsigned char key, int x, int y)
 {
-	float speed = 0.5f;
+	float rotate_speed = 0.25f;
+	float move_speed = 2.0f;
 	switch(key)
 	{
 		case 'w':
-			camera.move(vec4(camera.dir.x, 0.0f, camera.dir.z) * speed);
+			camera.move(vec4(camera.dir.x, 0.0f, camera.dir.z).normalize() * -move_speed);
 			break;
 		case 's':
-			camera.move(vec4(camera.dir.x, 0.0f, camera.dir.z) * -speed);
+			camera.move(vec4(camera.dir.x, 0.0f, camera.dir.z).normalize() * move_speed);
 			break;
 		case 'd':
-			camera.move(camera.right * -speed);
+			camera.move(camera.right * move_speed);
 			break;
 		case 'a':
-			camera.move(camera.right * speed);
+			camera.move(camera.right * -move_speed);
 			break;
 		case ' ':
-			camera.move(vec4(0.0f, 1.0f * speed, 0.0f));
+			camera.move(vec4(0.0f, 1.0f * move_speed, 0.0f));
 			break;
 		case 'c':
-			camera.move(vec4(0.0f, -1.0f * speed, 0.0f));
+			camera.move(vec4(0.0f, -1.0f * move_speed, 0.0f));
 			break;
 		case 'e':
-			camera.rotate(15.0f * speed, vec4(0.0f, 1.0f, 0.0f));
+			camera.rotate(15.0f * rotate_speed, vec4(0.0f, 1.0f, 0.0f));
 			break;
 		case 'q':
-			camera.rotate(-15.0f * speed, vec4(0.0f, 1.0f, 0.0f));
+			camera.rotate(-15.0f * rotate_speed, vec4(0.0f, 1.0f, 0.0f));
 			break;
 		case 'r':
-			camera.rotate(15.0f * speed, camera.right);//vec4(camera.right.x, 0.0f, camera.right.z));
+			camera.rotate(15.0f * rotate_speed, camera.right);
 			break;
 		case 'f':
-			camera.rotate(-15.0f * speed, camera.right);//vec4(camera.right.x, 0.0f, camera.right.z));
+			camera.rotate(-15.0f * rotate_speed, camera.right);
 			break;
-		default:
-			glutPostRedisplay();
+		case 27:
+			exit(0);
 			break;
+	}
+	glutPostRedisplay();
+}
+
+void mouse_move(int x, int y)
+{
+	float sensitivity = 0.1;
+	int cx = win_width / 2;
+	int cy = win_height / 2;
+	if (x != cx || y != cy)
+	{
+		float x_offset = x - cx;
+		float y_offset = y - cy;
+		glutWarpPointer(cx, cy);
+		camera.rotate(y_offset * sensitivity, camera.right);
+		camera.rotate(x_offset * sensitivity, vec4(0.0f, 1.0f, 0.0f));
+		glutPostRedisplay();
 	}
 }
 
@@ -257,13 +275,16 @@ int main(int argc, char *argv[])
 	gen_grid();
 	camera.look_at(vec4(5.0f, 10.0f, 30.0f),
 				   vec4(0.0f, 0.0f, 0.0f),
-				   vec4(0.0f, -1.0f, 0.0f));
+				   vec4(0.0f, 1.0f, 0.0f));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(800, 600);
+	glutGameModeString("1920x1080:32");
+	//glutKeyboardUpFunc() !!!!!!!!!!!!!!!несколько кнопок;
+	glutEnterGameMode();
+	glutWarpPointer(win_width / 2, win_height / 2);
+	glutSetCursor(GLUT_CURSOR_NONE);
 	glutInitContextVersion(4, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
-	glutCreateWindow("Test triangle");
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
@@ -271,6 +292,7 @@ int main(int argc, char *argv[])
 		printf("Error: %s.\n", glewGetErrorString(err));
 		return 1;
 	}
+
 	glClearColor(0.12, 0.34, 0.35, 0);
 	init_shader();
 	glEnable(GL_DEPTH_TEST);
@@ -286,10 +308,9 @@ int main(int argc, char *argv[])
 	glEnableVertexAttribArray(attr_location);
 	glutDisplayFunc(render);
 	glutKeyboardFunc(PressKeys);
-	glutTimerFunc(40, timer, 0);
+	glutPassiveMotionFunc(mouse_move);
+
+	///glutTimerFunc(40, timer, 0);
 	glutMainLoop();
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glDisableVertexAttribArray(attr_location);
 	return 0;
 }
