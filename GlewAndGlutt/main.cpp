@@ -16,157 +16,74 @@ GLuint VAO;
 GLuint VBO;
 GLuint attr_location;
 GLuint mvp_location;
-Camera  camera(45.0f, 800,  600, 0.1f, 100.0f);
+Camera  camera(45.0f, 800, 600, 0.1f, 500.0f);
 
-const int count_vertices = 30;
-//float vertices[] = {
-//	-1.0f, -1.0f, -0.5f,
-//	0.0f,  1.0f, -0.5f,
-//	1.0f, -1.0f, -0.5f,
-//	1.0f, 1.0f, -0.5f,
-//};
+const int count_vertices = 806;
+float vertices[count_vertices * 3]; 
 
-//vector <float> vertices;
-float vertices[count_vertices * 3] = {
-	0.0f, -100.0f, 0.0f,
-	0.0f, 100.0f, 0.0f,
+/*{
+	-0.5f, -0.5f, -0.5f,  
+	0.5f, -0.5f, -0.5f, 
+	0.5f,  0.5f, -0.5f, 
+	0.5f,  0.5f, -0.5f,  
+	-0.5f,  0.5f, -0.5f, 
+	-0.5f, -0.5f, -0.5f, 
 
-	0.0f, 0.0f, -100.0f,
-	0.0f, 0.0f, 100.0f,
-	- 100.0f, 0.0f, 0.0f,
-	100.0f, 0.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f, 
+	0.5f, -0.5f,  0.5f, 
+	0.5f,  0.5f,  0.5f,  
+	0.5f,  0.5f,  0.5f, 
+	-0.5f,  0.5f,  0.5f,  
+	-0.5f, -0.5f,  0.5f, 
 
-	-100.0f, 0.0f, 1.0f,
-	100.0f, 0.0f, 1.0f,
-	-100.0f, 0.0f, -1.0f,
-	100.0f, 0.0f, -1.0f,
-	-100.0f, 0.0f, 2.0f,
-	100.0f, 0.0f, 2.0f,
-	-100.0f, 0.0f, -2.0f,
-	100.0f, 0.0f, -2.0f,
-	-100.0f, 0.0f, 3.0f,
-	100.0f, 0.0f, 3.0f,
-	-100.0f, 0.0f, -3.0f,
-	100.0f, 0.0f, -3.0f,
+	-0.5f,  0.5f,  0.5f, 
+	-0.5f,  0.5f, -0.5f, 
+	-0.5f, -0.5f, -0.5f,  
+	-0.5f, -0.5f, -0.5f,  
+	-0.5f, -0.5f,  0.5f,  
+	-0.5f,  0.5f,  0.5f,  
 
-	1.0f, 0.0f, -100.0f,
-	1.0f, 0.0f, 100.0f,
-	-1.0f, 0.0f, -100.0f,
-	-1.0f, 0.0f, 100.0f,
-	-2.0f, 0.0f, -100.0f,
-	-2.0f, 0.0f, 100.0f,
-	-3.0f, 0.0f, -100.0f,
-	-3.0f, 0.0f, 100.0f,
-	2.0f, 0.0f, -100.0f,
-	2.0f, 0.0f, 100.0f,
-	3.0f, 0.0f, -100.0f,
-	3.0f, 0.0f, 100.0f,
+	0.5f,  0.5f,  0.5f, 
+	0.5f,  0.5f, -0.5f,  
+	0.5f, -0.5f, -0.5f, 
+	0.5f, -0.5f, -0.5f,  
+	0.5f, -0.5f,  0.5f, 
+	0.5f,  0.5f,  0.5f, 
 
+	-0.5f, -0.5f, -0.5f,  
+	0.5f, -0.5f, -0.5f, 
+	0.5f, -0.5f,  0.5f,  
+	0.5f, -0.5f,  0.5f, 
+	-0.5f, -0.5f,  0.5f,  
+	-0.5f, -0.5f, -0.5f,
 
-	//-0.5f, -0.5f, -0.5f,  
-	//0.5f, -0.5f, -0.5f, 
-	//0.5f,  0.5f, -0.5f, 
-	//0.5f,  0.5f, -0.5f,  
-	//-0.5f,  0.5f, -0.5f, 
-	//-0.5f, -0.5f, -0.5f, 
+	-0.5f,  0.5f, -0.5f,  
+	0.5f,  0.5f, -0.5f,  
+	0.5f,  0.5f,  0.5f,  
+	0.5f,  0.5f,  0.5f,  
+	-0.5f,  0.5f,  0.5f, 
+	-0.5f,  0.5f, -0.5f, 
+};*/
 
-	//-0.5f, -0.5f,  0.5f, 
-	//0.5f, -0.5f,  0.5f, 
-	//0.5f,  0.5f,  0.5f,  
-	//0.5f,  0.5f,  0.5f, 
-	//-0.5f,  0.5f,  0.5f,  
-	//-0.5f, -0.5f,  0.5f, 
-
-	//-0.5f,  0.5f,  0.5f, 
-	//-0.5f,  0.5f, -0.5f, 
-	//-0.5f, -0.5f, -0.5f,  
-	//-0.5f, -0.5f, -0.5f,  
-	//-0.5f, -0.5f,  0.5f,  
-	//-0.5f,  0.5f,  0.5f,  
-
-	//0.5f,  0.5f,  0.5f, 
-	//0.5f,  0.5f, -0.5f,  
-	//0.5f, -0.5f, -0.5f, 
-	//0.5f, -0.5f, -0.5f,  
-	//0.5f, -0.5f,  0.5f, 
-	//0.5f,  0.5f,  0.5f, 
-
-	//-0.5f, -0.5f, -0.5f,  
-	//0.5f, -0.5f, -0.5f, 
-	//0.5f, -0.5f,  0.5f,  
-	//0.5f, -0.5f,  0.5f, 
-	//-0.5f, -0.5f,  0.5f,  
-	//-0.5f, -0.5f, -0.5f,
-
-	//-0.5f,  0.5f, -0.5f,  
-	//0.5f,  0.5f, -0.5f,  
-	//0.5f,  0.5f,  0.5f,  
-	//0.5f,  0.5f,  0.5f,  
-	//-0.5f,  0.5f,  0.5f, 
-	//-0.5f,  0.5f, -0.5f, 
+void add_vertex(int i, float x, float y, float z)
+{
+	vertices[3 * i] = x;
+	vertices[3 * i + 1] = y;
+	vertices[3 * i + 2] = z;
 };
 
-void gen()
+void gen_grid()
 {	
-	//vertices.push_back(0.0f); vertices.push_back(-100.0f); vertices.push_back(0.0f);
-	//vertices.push_back(0.0f); vertices.push_back(100.0f); vertices.push_back(0.0f);
-	//vertices.push_back(0.0f); vertices.push_back(-100.0f); vertices.push_back(0.0f);
-	//vertices.push_back(0.0f); vertices.push_back(100.0f); vertices.push_back(0.0f);
-	//for (int i = -100; i <= 100; i += 1)
-	//{
-	//	vertices.push_back(i);
-	//	vertices.push_back(0.0f);
-	//	vertices.push_back(-100.0f);
-
-	//	vertices.push_back(i);
-	//	vertices.push_back(0.0f);
-	//	vertices.push_back(100.0f);
-
-	//	vertices.push_back(-100.0f);
-	//	vertices.push_back(0.0f);
-	//	vertices.push_back(i);
-
-	//	vertices.push_back(100.0f);
-	//	vertices.push_back(0.0f);
-	//	vertices.push_back(i);
-	//}
-	//vertices.push_back(0.0f);
-	//vertices.push_back(-100.0f);
-	//vertices.push_back(0.0f);
-
-	//vertices.push_back(0.0f);
-	//vertices.push_back(100.0f);
-	//vertices.push_back(0.0f);
-
-
-	//int j = 0;
-	//for (int i = -100; i <= 100; i += 1)
-	//{
-	//	vertices[3 * j] = i;
-	//	vertices[3 * j + 1] = 0.0f;
-	//	vertices[3 * j + 2] = -100.0f;
-
-	//	vertices[3 * (j + 1)] = i;
-	//	vertices[3 * (j + 1) + 1] = 0.0f;
-	//	vertices[3 * (j + 1) + 2] = 100.0f;
-
-	//	vertices[3 * (j + 2)] = -100.0f;
-	//	vertices[3 * (j + 2) + 1] = 0.0f;
-	//	vertices[3 * (j + 2) + 2] = i;
-
-	//	vertices[3 * (j + 3)] = 100.0f;
-	//	vertices[3 * (j + 3) + 1] = 0.0f;
-	//	vertices[3 * (j + 3) + 2] = i;
-	//	j += 4;
-	//}
-	//cout << j;
-	//vertices[3 * j] = 0.0f;
-	//vertices[3 * j + 1] = -100.0f;
-	//vertices[3 * j + 2] = 0.0f;
-
-	//vertices[3 * (j + 1)] = 0.0f;
-	//vertices[3 * (j + 1) + 1] = 100.0f;
-	//vertices[3 * (j + 1) + 2] = 0.0f;
+	int j = 0;
+	for (int i = -1000; i <= 1000; i += 10, j += 4)
+	{
+		add_vertex(j, i, 0, -1000);
+		add_vertex(j + 1, i, 0, 1000);
+		add_vertex(j + 2, -1000, 0, i);
+		add_vertex(j + 3, 1000, 0, i);
+	}
+	add_vertex(j, 0, -1000, 0);
+	add_vertex(j + 1, 0, 1000, 0);
 }
 
 float b = 1;
@@ -195,7 +112,7 @@ void render()
 	glm::mat4 model1;
 	model1 = glm::rotate(model1, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 projection1;
-	projection1 = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	projection1 = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
 	
 	mat4 mvp1;
 	//mvp = model * view * projection;
@@ -337,17 +254,8 @@ void timer(int value)
 
 int main(int argc, char *argv[])
 {
-	gen();
-	//for (int i = 0; i < 30/*3 * count_vertices + 3*/; i += 3)
-	//{
-	//	cout << vertices[i] << " " << vertices[i + 1] << " " << vertices[i + 2] << endl;
-	//}
-	//cout << vertices.size() / 3 << endl;
-	//for (int i = 0; i < vertices.size(); ++i)
-	//{
-	//	cout << vertices[i] << " ";// << vertices[i + 1] << " " << vertices[i + 2] << endl;
-	//}
-	camera.look_at(vec4(0.0f, 0.0f, 3.0f),
+	gen_grid();
+	camera.look_at(vec4(5.0f, 10.0f, 30.0f),
 				   vec4(0.0f, 0.0f, 0.0f),
 				   vec4(0.0f, -1.0f, 0.0f));
 	glutInit(&argc, argv);
