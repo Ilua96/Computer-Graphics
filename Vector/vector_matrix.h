@@ -45,10 +45,11 @@ public:
 	friend mat4 operator*(float a, mat4 &vec);
 	mat4 operator*(mat4 &other);
 	vec4 operator*(vec4 &vec);
-	mat4 scale(const vec4 &vec);
+	mat4 scale(vec4 &vec);
 	mat4 rotate(float angle, vec4 axis);
-	mat4 translation(vec4 &vec);
+	mat4 translate(vec4 &vec);
 	mat4 perspective(float fovy, float aspect, float near, float far);
+	mat4 orthographic(float left, float right, float bottom, float top, float near, float far);
 	string str();
 };
 

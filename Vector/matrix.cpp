@@ -22,6 +22,7 @@ mat4::mat4(float X1, float Y1, float Z1, float W1, float X2, float Y2, float Z2,
 	matrix[3][0] = X4;
 	matrix[3][1] = Y4;
 	matrix[3][2] = Z4;
+	matrix[3][2] = Z4;
 	matrix[3][3] = W4;
 }
 
@@ -181,7 +182,7 @@ mat4 mat4::operator*(mat4 &other)
 	return ans;
 }
 
-vec4 mat4::operator*(vec4 &vec)
+vec4 mat4::operator*(vec4 &vec) 
 {
 	vec4 ans;
 	for (int i = 0; i < 4; ++i)
@@ -194,7 +195,7 @@ vec4 mat4::operator*(vec4 &vec)
 	return ans;
 }
 
-mat4 mat4::scale(const vec4 & vec)
+mat4 mat4::scale(vec4 & vec)
 {
 	mat4 scale_mat;
 	scale_mat[0][0] = vec.x;
@@ -204,7 +205,7 @@ mat4 mat4::scale(const vec4 & vec)
 	return scale_mat * (*this);
 }
 
-mat4 mat4::rotate(float angle, vec4 axis)
+mat4 mat4::rotate(float angle,vec4 axis)
 {
 	angle = PI / 180 * angle;
 	axis.normalize_in_place();
@@ -218,14 +219,14 @@ mat4 mat4::rotate(float angle, vec4 axis)
 	return (tmp * (*this)).transpose();
 }
 
-mat4 mat4::translation(vec4 & vec)
+mat4 mat4::translate(vec4 & vec)
 {
 	mat4 tmp;
 	tmp.identity();
 	tmp[0][3] = vec.x;
 	tmp[1][3] = vec.y;
 	tmp[2][3] = vec.z;
-	return (tmp * (*this)).transpose();
+	return tmp * (*this);
 }
 
 mat4 mat4::perspective(float fovy, float aspect, float near, float far)
@@ -244,7 +245,20 @@ mat4 mat4::perspective(float fovy, float aspect, float near, float far)
 	tmp[2][2] = -(far + near) / (far - near);
 	tmp[2][3] = -(2 * far * near) / (far - near);
 	tmp[3][2] = -1;
-	return (tmp * (*this)).transpose();
+	return tmp * (*this);
+}
+
+mat4 mat4::orthographic(float left, float right, float bottom, float top, float near, float far)
+{
+	mat4 tmp;
+	tmp[0][0] = 2.0f / (right - left);
+	tmp[1][1] = 2.0f / (top - bottom);
+	tmp[2][2] = -2.0f / (far - near);
+	tmp[3][3] = 1.0f;
+	tmp[0][3] = -(right + left) / (right - left);
+	tmp[1][3] = -(top + bottom) / (top - bottom);
+	tmp[2][3] = -(far + near) / (far - near);
+	return tmp * (*this);
 }
 
 string mat4::str()

@@ -4,69 +4,21 @@
 #include <stdlib.h>
 #include <iostream>
 #include <vector_matrix.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <cmath>
 #include <camera.h>
-#include <vector>
 
 GLuint program;
 GLuint VAO;
 GLuint VBO;
 GLuint attr_location;
 GLuint mvp_location;
-int win_width = 1080;
-int win_height = 1920;
-Camera  camera(45.0f, win_height, win_width, 0.1f, 500.0f);
-
+int win_width = 1920;
+int win_height = 1080;
+Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
+//Camera camera(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 
 const int count_vertices = 806;
 float vertices[count_vertices * 3]; 
-
-/*{
-	-0.5f, -0.5f, -0.5f,  
-	0.5f, -0.5f, -0.5f, 
-	0.5f,  0.5f, -0.5f, 
-	0.5f,  0.5f, -0.5f,  
-	-0.5f,  0.5f, -0.5f, 
-	-0.5f, -0.5f, -0.5f, 
-
-	-0.5f, -0.5f,  0.5f, 
-	0.5f, -0.5f,  0.5f, 
-	0.5f,  0.5f,  0.5f,  
-	0.5f,  0.5f,  0.5f, 
-	-0.5f,  0.5f,  0.5f,  
-	-0.5f, -0.5f,  0.5f, 
-
-	-0.5f,  0.5f,  0.5f, 
-	-0.5f,  0.5f, -0.5f, 
-	-0.5f, -0.5f, -0.5f,  
-	-0.5f, -0.5f, -0.5f,  
-	-0.5f, -0.5f,  0.5f,  
-	-0.5f,  0.5f,  0.5f,  
-
-	0.5f,  0.5f,  0.5f, 
-	0.5f,  0.5f, -0.5f,  
-	0.5f, -0.5f, -0.5f, 
-	0.5f, -0.5f, -0.5f,  
-	0.5f, -0.5f,  0.5f, 
-	0.5f,  0.5f,  0.5f, 
-
-	-0.5f, -0.5f, -0.5f,  
-	0.5f, -0.5f, -0.5f, 
-	0.5f, -0.5f,  0.5f,  
-	0.5f, -0.5f,  0.5f, 
-	-0.5f, -0.5f,  0.5f,  
-	-0.5f, -0.5f, -0.5f,
-
-	-0.5f,  0.5f, -0.5f,  
-	0.5f,  0.5f, -0.5f,  
-	0.5f,  0.5f,  0.5f,  
-	0.5f,  0.5f,  0.5f,  
-	-0.5f,  0.5f,  0.5f, 
-	-0.5f,  0.5f, -0.5f, 
-};*/
 
 void add_vertex(int i, float x, float y, float z)
 {
@@ -78,7 +30,7 @@ void add_vertex(int i, float x, float y, float z)
 void gen_grid()
 {	
 	int j = 0;
-	for (int i = -0; i <= 2000; i += 10, j += 4)
+	for (int i = -1000; i <= 1000; i += 10, j += 4)
 	{
 		add_vertex(j, i, 0, -1000);
 		add_vertex(j + 1, i, 0, 1000);
@@ -89,109 +41,82 @@ void gen_grid()
 	add_vertex(j + 1, 0, 1000, 0);
 }
 
-float b = 1;
 void render()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(program);
-	mat4 model, mvp, view, projection;
-	model.identity();
-	view.identity();
-	projection.identity();
-	model = model.rotate(b * 10.0f, vec4(0.5f, 1.0f, 0.0f));
-	b += 0.05;
-	view = view.translation(vec4(0.0f, 0.0f, -3.0f));
-	projection = projection.perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
-	
-	glm::mat4 view1;
-	/*view1 = glm::translate(view1, glm::vec3(0.0f, 0.0f, -3.0f));*/
-	view1 = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 model1;
-	model1 = glm::rotate(model1, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::mat4 projection1;
-	projection1 = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
-	
-	mat4 mvp1;
-	//mvp = model * view * projection;
-	mvp1 = (projection * view).transpose();
-	//camera.move(vec4(0.0f, 0.0f, -0.04f));
+	mat4 mvp;
 	mvp = camera.get_mat();
-	//mvp1 = (projection1 * view1); //* model1;
-	//for (int i = 0; i < 4; ++i)
-	//{
-	//	for (int j = 0; j < 4; ++j)
-	//	{
-	//		cout << mvp1[i][j] << "|" << mvp[i][j] << "  ";
-	//	}
-	//	cout << endl;
-	//}
-	//cout << endl << endl;
-
-	//glm::mat4 trans;
-	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-
-	//mvp = mvp.scale(vec4(0.5f, 0.5f, 0.5f));
-	//mvp = mvp.rotate(2, b * 1);
-	//b += 0.04;
-	//mvp = mvp.translation(vec4(0, 0.25, 0));
-
-
 	mvp_location = glGetUniformLocation(program, "mvp");
-
-	//glm::mat4 trans;
-	////trans = glm::rotate(trans, 90.0f, glm::vec3(0.0, 0.0, 1.0));
-	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-
-	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, *(mvp.matrix));
+	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
 	glDrawArrays(GL_LINES, 0, count_vertices);
 	glUseProgram(0);
 	glutSwapBuffers();
 }
 
-void PressKeys(unsigned char key, int x, int y)
+bool is_key_press[128];
+void press_keys(unsigned char key, int x, int y)
 {
-	float rotate_speed = 0.25f;
-	float move_speed = 2.0f;
-	switch(key)
+	is_key_press[key] = true;
+	float rotate_speed = 4.0f;
+	float move_speed = 1.0f;
+	for (int i = 0; i < 128; ++i)
 	{
-		case 'w':
-			camera.move(vec4(camera.dir.x, 0.0f, camera.dir.z).normalize() * -move_speed);
-			break;
-		case 's':
-			camera.move(vec4(camera.dir.x, 0.0f, camera.dir.z).normalize() * move_speed);
-			break;
-		case 'd':
-			camera.move(camera.right * move_speed);
-			break;
-		case 'a':
-			camera.move(camera.right * -move_speed);
-			break;
-		case ' ':
-			camera.move(vec4(0.0f, 1.0f * move_speed, 0.0f));
-			break;
-		case 'c':
-			camera.move(vec4(0.0f, -1.0f * move_speed, 0.0f));
-			break;
-		case 'e':
-			camera.rotate(15.0f * rotate_speed, vec4(0.0f, 1.0f, 0.0f));
-			break;
-		case 'q':
-			camera.rotate(-15.0f * rotate_speed, vec4(0.0f, 1.0f, 0.0f));
-			break;
-		case 'r':
-			camera.rotate(15.0f * rotate_speed, camera.right);
-			break;
-		case 'f':
-			camera.rotate(-15.0f * rotate_speed, camera.right);
-			break;
-		case 27:
-			exit(0);
-			break;
+		if (is_key_press[i])
+		{
+			switch (i)
+			{
+				case 'w':
+					camera.move(vec4(camera.get_dir().x, 0.0f, camera.get_dir().z).normalize() * -move_speed);
+					break;
+				case 's':
+					camera.move(vec4(camera.get_dir().x, 0.0f, camera.get_dir().z).normalize() * move_speed);
+					break;
+				case 'd':
+					camera.move(camera.get_right() * move_speed);
+					break;
+				case 'a':
+					camera.move(camera.get_right() * -move_speed);
+					break;
+				case ' ':
+					camera.move(vec4(0.0f, 1.0f * move_speed, 0.0f));
+					break;
+				case 'c':
+					camera.move(vec4(0.0f, -1.0f * move_speed, 0.0f));
+					break;
+				case 'e':
+					camera.rotate(rotate_speed, vec4(0.0f, 1.0f, 0.0f));
+					break;
+				case 'q':
+					camera.rotate(-rotate_speed, vec4(0.0f, 1.0f, 0.0f));
+					break;
+				case 'r':
+					camera.rotate(-rotate_speed, camera.get_right());
+					break;
+				case 'f':
+					camera.rotate(rotate_speed, camera.get_right());
+					break;
+				case 'z':
+					camera.zoom(5.0f);
+					break;
+				case 'x':
+					camera.zoom(-5.0f);
+					break;
+				case 'g':
+					camera.set_normal_zoom();
+					break;
+				case 27:
+					exit(0);
+					break;
+			}
+		}
 	}
 	glutPostRedisplay();
+}
+
+void up_keys(unsigned char key, int x, int y)
+{
+	is_key_press[key] = false;
 }
 
 void mouse_move(int x, int y)
@@ -199,12 +124,12 @@ void mouse_move(int x, int y)
 	float sensitivity = 0.1;
 	int cx = win_width / 2;
 	int cy = win_height / 2;
-	if (x != cx || y != cy)
+	if (x != cx || y != cy)  
 	{
 		float x_offset = x - cx;
 		float y_offset = y - cy;
 		glutWarpPointer(cx, cy);
-		camera.rotate(y_offset * sensitivity, camera.right);
+		camera.rotate(y_offset * sensitivity, camera.get_right());
 		camera.rotate(x_offset * sensitivity, vec4(0.0f, 1.0f, 0.0f));
 		glutPostRedisplay();
 	}
@@ -237,7 +162,6 @@ void create_shader(GLuint shader, char **string, char *shader_name)
 
 void init_shader() 
 {
-
 	char *vs_text = NULL;
 	read_all_file("VS.txt", &vs_text);
 
@@ -273,15 +197,13 @@ void timer(int value)
 int main(int argc, char *argv[])
 {
 	gen_grid();
-	camera.look_at(vec4(5.0f, 10.0f, 30.0f),
+	camera.look_at(vec4(5.0f, 10.0f, 90.0f),
 				   vec4(0.0f, 0.0f, 0.0f),
 				   vec4(0.0f, 1.0f, 0.0f));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutGameModeString("1920x1080:32");
-	//glutKeyboardUpFunc() !!!!!!!!!!!!!!!несколько кнопок;
 	glutEnterGameMode();
-	glutWarpPointer(win_width / 2, win_height / 2);
 	glutSetCursor(GLUT_CURSOR_NONE);
 	glutInitContextVersion(4, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
@@ -295,7 +217,6 @@ int main(int argc, char *argv[])
 
 	glClearColor(0.12, 0.34, 0.35, 0);
 	init_shader();
-	glEnable(GL_DEPTH_TEST);
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
@@ -306,11 +227,13 @@ int main(int argc, char *argv[])
 	attr_location = glGetAttribLocation(program, "position");
 	glVertexAttribPointer(attr_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(attr_location);
-	glutDisplayFunc(render);
-	glutKeyboardFunc(PressKeys);
-	glutPassiveMotionFunc(mouse_move);
 
-	///glutTimerFunc(40, timer, 0);
+	glutWarpPointer(win_width / 2, win_height / 2);
+	glutDisplayFunc(render);
+	glutKeyboardFunc(press_keys);
+	glutKeyboardUpFunc(up_keys);
+	glutPassiveMotionFunc(mouse_move);
+	//glutTimerFunc(40, timer, 0);
 	glutMainLoop();
 	return 0;
 }

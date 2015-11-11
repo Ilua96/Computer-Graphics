@@ -134,8 +134,9 @@ TEST_F(TestVec4, Cross)
 	TestValues(vec_1.cross(my_vec_1), 2, -4, 2, 0);
 	vec4 vec_2(3.5f, -0.4f, 5.1f, 1.0f);
 	TestValues(my_vec_1.cross(vec_2), 11.4f, 5.4f, -7.4f, 0.0f);
-
 }
+
+
 
 int main(int argc, char *argv[])
 {
