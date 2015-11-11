@@ -4,6 +4,9 @@
 #include "vector_matrix.h"
 #include <cmath>
 #include <algorithm>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace Eigen;
 
@@ -45,6 +48,17 @@ void TestValues(mat4& mat, Matrix4f& e_mat)
 		for (int j = 0; j < 4; ++j)
 		{
 			EXPECT_FLOAT_EQ(mat[i][j], e_mat(i, j));
+		}
+	}
+}
+
+void TestValues(mat4& mat, glm::mat4& g_mat)
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			EXPECT_FLOAT_EQ(mat[i][j], g_mat[i][j]);
 		}
 	}
 }
@@ -159,4 +173,49 @@ TEST_F(TestMat4, MultVector)
 	Vector4f eigen_vec(12.35f, -2145.1234f, 1254.125321f, 5.0f);
 	TestValues(my_mat_1 * my_vec, (VectorXf)(eigen_mat_1 * eigen_vec));
 	TestValues(my_mat_2 * my_vec, (VectorXf)(eigen_mat_2 * eigen_vec));
+}
+
+TEST_F(TestMat4, Translate)
+{
+	glm::mat4 g_mat;
+	mat4 my_mat;
+	my_mat.identity();
+	g_mat = glm::translate(g_mat, glm::vec3(-13.5f, 56.0f, 1.0f));
+	my_mat = my_mat.translate(vec4(-13.5f, 56.0f, 1.0f)).transpose();
+	TestValues(my_mat, g_mat);
+}
+
+TEST_F(TestMat4, Rotate)
+{
+	glm::mat4 g_mat, g_mat_1;
+	mat4 my_mat;
+	my_mat.identity();
+	g_mat = glm::rotate(g_mat, glm::radians(-67.3f), glm::vec3(-13.5f, 56.0f, 1.0f));
+	my_mat = my_mat.rotate(-67.3f, vec4(-13.5f, 56.0f, 1.0f));
+	TestValues(my_mat, g_mat);
+	my_mat.identity();
+	g_mat_1 = glm::rotate(g_mat_1, glm::radians(160.0f), glm::vec3(3.0f, -156.0f, 123.044f));
+	my_mat = my_mat.rotate(160.0f, vec4(3.0f, -156.0f, 123.044f));
+	TestValues(my_mat, g_mat_1);
+}
+
+TEST_F(TestMat4, Perspective)
+{
+	glm::mat4 g_mat;
+	mat4 my_mat;
+	my_mat.identity();
+	g_mat = glm::perspective(glm::radians(60.0f), 800.0f / 600.0f, 0.1f, 200.0f);
+	my_mat = my_mat.perspective(60.0f, 800.0f / 600.0f, 0.1f, 200.0f).transpose();
+	TestValues(my_mat, g_mat);
+}
+
+
+TEST_F(TestMat4, Orthographic)
+{
+	glm::mat4 g_mat;
+	mat4 my_mat;
+	my_mat.identity();
+	g_mat = glm::ortho(-200.0f, 800.0f, -150.0f, 600.0f, 0.1f, 300.0f);
+	my_mat = my_mat.orthographic(-200.0f, 800.0f, -150.0f, 600.0f, 0.1f, 300.0f).transpose();
+	TestValues(my_mat, g_mat);
 }
