@@ -11,8 +11,9 @@ class Camera
 		void look_at(const vec4 &Pos, const vec4 &Tar, const vec4 &Up);
 		void set_normal_zoom();
 		mat4 get_mat();
-		vec4 get_dir() const;
-		vec4 get_right() const;
+		vec4 get_dir();
+		vec4 get_right();
+		vec4 get_pos();
 	private:
 		int width, hight;
 		float normal_fovy, fovy, near_plane, far_plane, left, right_fur, bottom, top;

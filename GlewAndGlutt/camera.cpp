@@ -15,10 +15,7 @@ Camera::Camera(float left, float right, float bottom, float top, float near_plan
 void Camera::move(const vec4 & vec)
 {
 	pos = pos + vec;
-	tar = tar + vec;
-	right = up.cross(dir).normalize();
-	dir = pos - tar;
-	dir.normalize_in_place();
+	//tar = tar + vec;
 }
 
 void Camera::rotate(float angle, const vec4 & vec)
@@ -29,7 +26,7 @@ void Camera::rotate(float angle, const vec4 & vec)
 	up = (tmp * up).normalize();
 	dir = (tmp * dir).normalize();
 	right = up.cross(dir).normalize();
-	tar = pos - dir;
+	//tar = pos - dir;
 }
 
 void Camera::zoom(float value)
@@ -72,15 +69,21 @@ mat4 Camera::get_mat()
 		projection = projection.orthographic(left, right_fur, bottom, top, near_plane, far_plane);
 	}
 	view = mat4(right.x, right.y, right.z, 0, up.x, up.y, up.z, 0, dir.x, dir.y, dir.z, 0, 0, 0, 0, 1) * mat4(1, 0, 0, -pos.x, 0, 1, 0, -pos.y, 0, 0, 1, -pos.z, 0, 0, 0, 1);
+	//cout << projection.str() << endl;
 	return projection * view;
 }
 
-vec4 Camera::get_dir() const
+vec4 Camera::get_dir()
 {
 	return dir;
 }
 
-vec4 Camera::get_right() const
+vec4 Camera::get_right()
 {
 	return right;
+}
+
+vec4 Camera::get_pos()
+{
+	return pos;
 }
