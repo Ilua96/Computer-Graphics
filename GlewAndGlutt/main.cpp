@@ -8,6 +8,9 @@
 #include <camera.h>
 #include <string>
 #include <sstream>
+#include <lights.h>
+#include <vector>
+#define PI 3.14159265
 
 GLuint main_program;
 GLuint light_program;
@@ -18,7 +21,7 @@ GLuint mvp_location;
 int win_width = 1920;
 int win_height = 1080;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
-//Camera camera(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 500.0f);  
+//Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
 
 
 const int count_cube_vertices = 36;//806;
@@ -302,25 +305,29 @@ void render()
 	model = model.translate(vec4(0.0f, 5.0f, 0.0f)) * model.scale(vec4(3.0f, 3.0f, 3.0f));
 	mvp = camera.get_mat() * model;
 	glUniform3f(glGetUniformLocation(main_program, "view_pos"), camera.get_pos().x, camera.get_pos().y, camera.get_pos().z);
-	// Set material properties
-	glUniform1f(glGetUniformLocation(main_program, "material.shininess"), 32.0f);
-	glUniform3f(glGetUniformLocation(main_program, "material.ambient"), 1.0f, 0.5f, 0.31f);
-	glUniform3f(glGetUniformLocation(main_program, "material.diffuse"), 1.0f, 0.5f, 0.31f);
-	glUniform3f(glGetUniformLocation(main_program, "material.specular"), 0.5f, 0.5f, 0.5f);
-	glUniform3f(glGetUniformLocation(main_program, "point_lights[0].pos"), 10.0f, 10.0f, 5.0f);
-	glUniform3f(glGetUniformLocation(main_program, "point_lights[0].color"), 1.0f, 1.0f, 1.0f);
-	glUniform1f(glGetUniformLocation(main_program, "point_lights[0].constant"), 1.0f);
-	glUniform1f(glGetUniformLocation(main_program, "point_lights[0].linear"), 0.09);
-	glUniform1f(glGetUniformLocation(main_program, "point_lights[0].quadr"), 0.032);
-	//GLint object_color_loc = glGetUniformLocation(main_program, "object_color");
-	//GLint light_color_loc = glGetUniformLocation(main_program, "light_color");
-	//GLint light_pos_loc = glGetUniformLocation(main_program, "light_pos");
+	glUniform1f(glGetUniformLocation(main_program, "material.shininess"), 64.0f);
+	glUniform3f(glGetUniformLocation(main_program, "material.ambient"), 0.25f, 0.25f, 0.25f);
+	glUniform3f(glGetUniformLocation(main_program, "material.diffuse"), 0.4f, 0.4f, 0.4f);
+	glUniform3f(glGetUniformLocation(main_program, "material.specular"), 0.774597f, 0.774597f, 0.774597f);
+
+	point_lights[0].set(main_program, 0);
+	//glUniform3f(glGetUniformLocation(main_program, "point_lights[0].pos"), 10.0f, 20.0f, 5.0f);
+	//glUniform3f(glGetUniformLocation(main_program, "point_lights[0].color"), 1.0f, 1.0f, 1.0f);
+	//glUniform1f(glGetUniformLocation(main_program, "point_lights[0].constant"), 1.0f);
+	//glUniform1f(glGetUniformLocation(main_program, "point_lights[0].linear"), 0.027f);
+	//glUniform1f(glGetUniformLocation(main_program, "point_lights[0].quadr"), 0.0028f);
+
+	//glUniform3f(glGetUniformLocation(main_program, "spot_lights[0].pos"), 40.0f, 20.0f, 15.0f);//camera.get_pos().x, camera.get_pos().y, camera.get_pos().z);
+	//glUniform3f(glGetUniformLocation(main_program, "spot_lights[0].dir"), 0.0f, -1.0, 0.0f);//-camera.get_dir().x, -camera.get_dir().y, -camera.get_dir().z);
+	//glUniform1f(glGetUniformLocation(main_program, "spot_lights[0].angle"), cos(PI / 180 * 25.0f));
+	//glUniform3f(glGetUniformLocation(main_program, "spot_lights[0].color"), 1.0f, 0.0f, 0.0f);
+	//glUniform1f(glGetUniformLocation(main_program, "spot_lights[0].constant"), 1.0f);
+	//glUniform1f(glGetUniformLocation(main_program, "spot_lights[0].linear"), 0.027f);
+	//glUniform1f(glGetUniformLocation(main_program, "spot_lights[0].quadr"), 0.0028f);
+
+	//glUniform3f(glGetUniformLocation(main_program, "dir_lights[0].color"), 0.1f, 0.1f, 0.1f);
+	//glUniform3f(glGetUniformLocation(main_program, "dir_lights[0].dir"), 0.0f, -1.0f, 0.0f);
 	GLint model_loc = glGetUniformLocation(main_program, "model");
-	//GLint view_pos_loc = glGetUniformLocation(main_program, "view_pos");
-	//glUniform3f(object_color_loc, 0.0f, 0.5f, 0.0f);
-	//glUniform3f(light_color_loc, 1.0f, 1.0f, 1.0f);
-	//glUniform3f(light_pos_loc, 10.0f, 10.0f, 5.0f);
-	//glUniform3f(view_pos_loc, camera.get_pos().x, camera.get_pos().y, camera.get_pos().z);
 	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
 	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
 	glBindVertexArray(VAO);
@@ -351,15 +358,23 @@ void render()
 	glutSwapBuffers();
 }
 
+void init_lights()
+{
+	point_lights.push_back(Point_Light(vec4(10.0f, 20.0f, 5.0f), vec4(1.0f, 1.0f, 1.0f), 1.0f, 0.027f, 0.0028f));
+	spot_lights.push_back(Spot_Light(vec4(40.0f, 20.0f, 15.0f), vec4(0.0f, -1.0, 0.0f), vec4(1.0f, 0.0f, 0.0f), cosf(PI / 180 * 25.0f), 1.0f, 0.027f, 0.0028f));
+	dir_lights.push_back(Dir_Light(vec4(0.1f, 0.1f, 0.1f), vec4(0.0f, -1.0f, 0.0f)));
+}
+
 int main(int argc, char *argv[])
 {
-	//gen_grid();
+	//gen_grid
+	init_lights();
 	camera.look_at(vec4(5.0f, 5.0f, -25.0f),
 				   vec4(0.0f, 0.0f, 0.0f),
 				   vec4(0.0f, 1.0f, 0.0f));
 	//camera.get_mat();
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutGameModeString(get_game_mode_string().c_str());
 	glutEnterGameMode();
 	glutSetCursor(GLUT_CURSOR_NONE);

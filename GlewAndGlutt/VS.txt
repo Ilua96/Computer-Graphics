@@ -7,6 +7,6 @@ out vec3 frag_pos;
 void main(void)
 {
 	gl_Position = mvp * vec4(position, 1.0); 
-	Normal = normal;
+	Normal = /*mat3(transpose(inverse(model))) **/ normal; 
 	frag_pos = vec3(model * vec4(position, 1.0f));
 }
