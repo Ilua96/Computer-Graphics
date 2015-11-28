@@ -88,7 +88,7 @@ vec3 spot_light(Spot_Light light)
 vec3 dir_light(Dir_Light light)
 {
 	float diff_strength = 0.8;
-	float ambient_strength = 0.1;
+	float ambient_strength = 0.2;
 	vec3 view_dir = normalize(view_pos - frag_pos);
 	vec3 light_dir = normalize(-light.dir);
 	vec3 norm = normalize(Normal);
@@ -98,7 +98,7 @@ vec3 dir_light(Dir_Light light)
 	vec3 ambient = light.color * material.ambient * ambient_strength;
 	vec3 diffuse = light.color * diff * material.diffuse * diff_strength;
 	vec3 specular = light.color * spec * material.specular;
-	return (ambient + diffuse + specular) ;
+	return (ambient + diffuse + specular);
 }
 
 void main(void)

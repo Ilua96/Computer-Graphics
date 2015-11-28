@@ -22,7 +22,7 @@ int win_width = 1920;
 int win_height = 1080;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
 //Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
-
+enum focus {f_camera, f_point, f_dir, f_spot} cur_focus;
 
 const int count_cube_vertices = 36;//806;
 //float vertices[count_vertices * 3]; 
@@ -232,56 +232,80 @@ void timer(int value)
 {
 	float rotate_speed = 3.0f;
 	float move_speed = 1.0f;
-	for (int i = 0; i < 128; ++i)
+	float color_speed = 0.05f;
+	if (is_key_press[27])
+		exit(0);
+	if (is_key_press['p'])
 	{
-		if (is_key_press[i])
-		{
-			switch (i)
-			{
-			case 'w':
-				camera.move(vec4(camera.get_dir().x, 0.0f, camera.get_dir().z).normalize() * -move_speed);
-				break;
-			case 's':
-				camera.move(vec4(camera.get_dir().x, 0.0f, camera.get_dir().z).normalize() * move_speed);
-				break;
-			case 'd':
-				camera.move(camera.get_right() * move_speed);
-				break;
-			case 'a':
-				camera.move(camera.get_right() * -move_speed);
-				break;
-			case ' ':
-				camera.move(vec4(0.0f, 1.0f * move_speed, 0.0f));
-				break;
-			case 'c':
-				camera.move(vec4(0.0f, -1.0f * move_speed, 0.0f));
-				break;
-			case 'e':
-				camera.rotate(rotate_speed, vec4(0.0f, 1.0f, 0.0f));
-				break;
-			case 'q':
-				camera.rotate(-rotate_speed, vec4(0.0f, 1.0f, 0.0f));
-				break;
-			case 'r':
-				camera.rotate(-rotate_speed, camera.get_right());
-				break;
-			case 'f':
-				camera.rotate(rotate_speed, camera.get_right());
-				break;
-			case 'z':
-				camera.zoom(5.0f);
-				break;
-			case 'x':
-				camera.zoom(-5.0f);
-				break;
-			case 'g':
-				camera.set_normal_zoom();
-				break;
-			case 27:
-				exit(0);
-				break;
-			}
-		}
+		cur_focus = f_point;
+	}
+	if (is_key_press['o'])
+	{
+		cur_focus = f_spot;
+	}
+	if (is_key_press['i'])
+	{
+		cur_focus = f_dir;
+	}
+	if (is_key_press['u'])
+	{
+		cur_focus = f_camera;
+	}
+	if (cur_focus == f_camera)
+	{
+		if (is_key_press['w'])
+			camera.move(vec4(camera.get_dir().x, 0.0f, camera.get_dir().z).normalize() * -move_speed);
+		if (is_key_press['s'])
+			camera.move(vec4(camera.get_dir().x, 0.0f, camera.get_dir().z).normalize() * move_speed);
+		if (is_key_press['d'])
+			camera.move(camera.get_right() * move_speed);
+		if (is_key_press['a'])
+			camera.move(camera.get_right() * -move_speed);
+		if (is_key_press[' '])
+			camera.move(vec4(0.0f, 1.0f * move_speed, 0.0f));
+		if (is_key_press['c'])
+			camera.move(vec4(0.0f, -1.0f * move_speed, 0.0f));
+		if (is_key_press['e'])
+			camera.rotate(rotate_speed, vec4(0.0f, 1.0f, 0.0f));
+		if (is_key_press['q'])
+			camera.rotate(-rotate_speed, vec4(0.0f, 1.0f, 0.0f));
+		if (is_key_press['r'])
+			camera.rotate(-rotate_speed, camera.get_right());
+		if (is_key_press['f'])
+			camera.rotate(rotate_speed, camera.get_right());
+		if (is_key_press['z'])
+			camera.zoom(5.0f);
+		if (is_key_press['x'])
+			camera.zoom(-5.0f);
+		if (is_key_press['g'])
+			camera.set_normal_zoom();
+	}
+	if (cur_focus == f_point)
+	{
+		if (is_key_press['w'])
+			point_lights[0].move(vec4(0.0f, 0.0f, 1.0f * move_speed));
+		if (is_key_press['s'])
+			point_lights[0].move(vec4(0.0f, 0.0f, 1.0f * -move_speed));
+		if (is_key_press['d'])
+			point_lights[0].move(vec4(1.0f * -move_speed, 0.0f, 0.0f));
+		if (is_key_press['a'])
+			point_lights[0].move(vec4(1.0f * move_speed, 0.0f, 0.0f));
+		if (is_key_press[' '])
+			point_lights[0].move(vec4(0.0f, 1.0f * move_speed, 0.0f));
+		if (is_key_press['c'])
+			point_lights[0].move(vec4(0.0f, -1.0f * move_speed, 0.0f));
+		if (is_key_press['j'])
+			point_lights[0].change_color(vec4(1.0f * color_speed, 0.0f, 0.0f));
+		if (is_key_press['m'])
+			point_lights[0].change_color(vec4(1.0f * -color_speed, 0.0f, 0.0f));
+		if (is_key_press['k'])
+			point_lights[0].change_color(vec4(0.0f, 1.0f * color_speed, 0.0f));
+		if (is_key_press[','])
+			point_lights[0].change_color(vec4(0.0f, 1.0f * -color_speed, 0.0f));
+		if (is_key_press['l'])
+			point_lights[0].change_color(vec4(0.0f, 0.0f, 1.0f * color_speed));
+		if (is_key_press['.'])
+			point_lights[0].change_color(vec4(0.0f, 0.0f, 1.0f * -color_speed));
 	}
 	glutPostRedisplay();
 	glutTimerFunc(40, timer, 0);
@@ -302,7 +326,7 @@ void render()
 
 	glUseProgram(main_program);
 	mvp_location = glGetUniformLocation(light_program, "mvp");
-	model = model.translate(vec4(0.0f, 5.0f, 0.0f)) * model.scale(vec4(3.0f, 3.0f, 3.0f));
+	model = model.translate(vec4(0.0f, 5.0f, 0.0f)) * model.scale(vec4(10.0f, 10.0f, 10.0f));
 	mvp = camera.get_mat() * model;
 	glUniform3f(glGetUniformLocation(main_program, "view_pos"), camera.get_pos().x, camera.get_pos().y, camera.get_pos().z);
 	glUniform1f(glGetUniformLocation(main_program, "material.shininess"), 64.0f);
@@ -311,22 +335,9 @@ void render()
 	glUniform3f(glGetUniformLocation(main_program, "material.specular"), 0.774597f, 0.774597f, 0.774597f);
 
 	point_lights[0].set(main_program, 0);
-	//glUniform3f(glGetUniformLocation(main_program, "point_lights[0].pos"), 10.0f, 20.0f, 5.0f);
-	//glUniform3f(glGetUniformLocation(main_program, "point_lights[0].color"), 1.0f, 1.0f, 1.0f);
-	//glUniform1f(glGetUniformLocation(main_program, "point_lights[0].constant"), 1.0f);
-	//glUniform1f(glGetUniformLocation(main_program, "point_lights[0].linear"), 0.027f);
-	//glUniform1f(glGetUniformLocation(main_program, "point_lights[0].quadr"), 0.0028f);
+	spot_lights[0].set(main_program, 0);
+	dir_lights[0].set(main_program, 0);
 
-	//glUniform3f(glGetUniformLocation(main_program, "spot_lights[0].pos"), 40.0f, 20.0f, 15.0f);//camera.get_pos().x, camera.get_pos().y, camera.get_pos().z);
-	//glUniform3f(glGetUniformLocation(main_program, "spot_lights[0].dir"), 0.0f, -1.0, 0.0f);//-camera.get_dir().x, -camera.get_dir().y, -camera.get_dir().z);
-	//glUniform1f(glGetUniformLocation(main_program, "spot_lights[0].angle"), cos(PI / 180 * 25.0f));
-	//glUniform3f(glGetUniformLocation(main_program, "spot_lights[0].color"), 1.0f, 0.0f, 0.0f);
-	//glUniform1f(glGetUniformLocation(main_program, "spot_lights[0].constant"), 1.0f);
-	//glUniform1f(glGetUniformLocation(main_program, "spot_lights[0].linear"), 0.027f);
-	//glUniform1f(glGetUniformLocation(main_program, "spot_lights[0].quadr"), 0.0028f);
-
-	//glUniform3f(glGetUniformLocation(main_program, "dir_lights[0].color"), 0.1f, 0.1f, 0.1f);
-	//glUniform3f(glGetUniformLocation(main_program, "dir_lights[0].dir"), 0.0f, -1.0f, 0.0f);
 	GLint model_loc = glGetUniformLocation(main_program, "model");
 	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
 	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
@@ -345,13 +356,17 @@ void render()
 	glUseProgram(0);
 
 	glUseProgram(light_program);
-	model.identity();
-	model = model.translate(vec4(10.0f, 10.0f, 5.0f, 0.0f));
-	mvp = camera.get_mat() * model;
-	mvp_location = glGetUniformLocation(light_program, "mvp");
-	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, count_cube_vertices);
+	mvp_location = glGetUniformLocation(light_program, "mvp");
+	GLuint light_color_loc = glGetUniformLocation(light_program, "light_color");
+	for (int i = 0; i < point_lights.size(); ++i)
+	{
+		point_lights[i].draw_light_source(camera, mvp_location, light_color_loc, count_cube_vertices);
+	}
+	for (int i = 0; i < spot_lights.size(); ++i)
+	{
+		spot_lights[i].draw_light_source(camera, mvp_location, light_color_loc, count_cube_vertices);
+	}
 	glBindVertexArray(0);
 	glUseProgram(0);
 
@@ -361,13 +376,14 @@ void render()
 void init_lights()
 {
 	point_lights.push_back(Point_Light(vec4(10.0f, 20.0f, 5.0f), vec4(1.0f, 1.0f, 1.0f), 1.0f, 0.027f, 0.0028f));
-	spot_lights.push_back(Spot_Light(vec4(40.0f, 20.0f, 15.0f), vec4(0.0f, -1.0, 0.0f), vec4(1.0f, 0.0f, 0.0f), cosf(PI / 180 * 25.0f), 1.0f, 0.027f, 0.0028f));
-	dir_lights.push_back(Dir_Light(vec4(0.1f, 0.1f, 0.1f), vec4(0.0f, -1.0f, 0.0f)));
+	spot_lights.push_back(Spot_Light(vec4(40.0f, 10.0f, 15.0f), vec4(1.0f, -1.0, 0.0f), vec4(1.0f, 0.0f, 0.0f), cosf(PI / 180 * 25.0f), 1.0f, 0.027f, 0.0028f));
+	dir_lights.push_back(Dir_Light(vec4(0.0f, -1.0f, 0.0f), vec4(0.2f, 0.2f, 0.2f)));
 }
 
 int main(int argc, char *argv[])
 {
 	//gen_grid
+	cur_focus = f_camera;
 	init_lights();
 	camera.look_at(vec4(5.0f, 5.0f, -25.0f),
 				   vec4(0.0f, 0.0f, 0.0f),
