@@ -10,6 +10,7 @@ class Camera
 		void zoom(float value);
 		void look_at(const vec4 &Pos, const vec4 &Tar, const vec4 &Up);
 		void set_normal_zoom();
+		void key_press(bool is_key_press[128]);
 		mat4 get_mat();
 		vec4 get_dir();
 		vec4 get_right();

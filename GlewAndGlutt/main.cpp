@@ -22,7 +22,7 @@ int win_width = 1920;
 int win_height = 1080;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
 //Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
-enum focus {f_camera, f_point, f_dir, f_spot} cur_focus;
+enum focus {f_camera, f_point, f_dir, f_spot, f_ambient} cur_focus;
 
 const int count_cube_vertices = 36;//806;
 //float vertices[count_vertices * 3]; 
@@ -32,7 +32,7 @@ float cube_vertices[] = {
 	0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 	0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
 
 	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 	0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
@@ -149,6 +149,76 @@ bool is_key_press[128];
 void press_keys(unsigned char key, int x, int y)
 {
 	is_key_press[key] = true;
+	switch (cur_focus)
+	{ 
+		case f_spot:
+			if (is_key_press['n'])
+			{
+				if (spot_lights.size() < 10)
+				{
+					spot_lights.push_back(Spot_Light(vec4(0.0f, 20.0f, 0.0f), vec4(0.0f, -1.0, 0.0f),
+						vec4(0.0f, 0.0f, -1.0f), vec4(1.0f, 1.0f, 1.0f), cosf(PI / 180.0f * 25.0f), 1.0f, 0.027f, 0.0028f));
+					cur_spot_light = spot_lights.size() - 1;
+				}
+			}
+			if (is_key_press['b'])
+			{
+				if (spot_lights.size() > 1)
+				{
+					spot_lights.erase(spot_lights.begin() + cur_spot_light);
+					--cur_spot_light;
+				}
+			}
+			if (is_key_press['y'])
+				cur_spot_light = ++cur_spot_light % spot_lights.size();
+			if (is_key_press['h'])
+				cur_spot_light = --cur_spot_light % spot_lights.size();
+			break;
+		case f_point:
+			if (is_key_press['n'])
+			{
+				if (point_lights.size() < 10)
+				{
+					point_lights.push_back(Point_Light(vec4(0.0f, 20.0f, 0.0f), vec4(1.0f, 1.0f, 1.0f), 1.0f, 0.027f, 0.0028f));
+					cur_point_light = point_lights.size() - 1;
+				}
+			}
+			if (is_key_press['b'])
+			{
+				if (point_lights.size() > 1)
+				{
+					point_lights.erase(point_lights.begin() + cur_point_light);
+					--cur_point_light;
+				}
+			}
+			if (is_key_press['y'])
+				cur_point_light = ++cur_point_light % point_lights.size();
+			if (is_key_press['h'])
+				cur_point_light = --cur_point_light % point_lights.size();
+			break;
+		case f_dir:
+			if (is_key_press['n'])
+			{
+				if (dir_lights.size() < 10)
+				{
+					dir_lights.push_back(Dir_Light(vec4(0.0f, -1.0f, 0.0f), vec4(0.0f, 0.0f, 1.0f), vec4(1.0f, 1.0f, 1.0f)));
+					cur_dir_light = dir_lights.size() - 1;
+				}
+			}
+			if (is_key_press['b'])
+			{
+				if (dir_lights.size() > 1)
+				{
+					dir_lights.erase(dir_lights.begin() + cur_dir_light);
+					--cur_dir_light;
+				}
+			}
+			if (is_key_press['y'])
+				cur_dir_light = ++cur_dir_light % dir_lights.size();
+			if (is_key_press['h'])
+				cur_dir_light = --cur_dir_light % dir_lights.size();
+			break;
+	}
 }
 
 void up_keys(unsigned char key, int x, int y)
@@ -230,82 +300,49 @@ GLuint create_program(char *VS_name, char *FS_name)
 
 void timer(int value)
 {
-	float rotate_speed = 3.0f;
-	float move_speed = 1.0f;
-	float color_speed = 0.05f;
 	if (is_key_press[27])
 		exit(0);
 	if (is_key_press['p'])
 	{
 		cur_focus = f_point;
+		cur_point_light = 0;
 	}
 	if (is_key_press['o'])
 	{
 		cur_focus = f_spot;
+		cur_spot_light = 0;
 	}
 	if (is_key_press['i'])
 	{
 		cur_focus = f_dir;
+		cur_dir_light = 0;
 	}
 	if (is_key_press['u'])
 	{
 		cur_focus = f_camera;
 	}
-	if (cur_focus == f_camera)
+	switch (cur_focus)
 	{
-		if (is_key_press['w'])
-			camera.move(vec4(camera.get_dir().x, 0.0f, camera.get_dir().z).normalize() * -move_speed);
-		if (is_key_press['s'])
-			camera.move(vec4(camera.get_dir().x, 0.0f, camera.get_dir().z).normalize() * move_speed);
-		if (is_key_press['d'])
-			camera.move(camera.get_right() * move_speed);
-		if (is_key_press['a'])
-			camera.move(camera.get_right() * -move_speed);
-		if (is_key_press[' '])
-			camera.move(vec4(0.0f, 1.0f * move_speed, 0.0f));
-		if (is_key_press['c'])
-			camera.move(vec4(0.0f, -1.0f * move_speed, 0.0f));
-		if (is_key_press['e'])
-			camera.rotate(rotate_speed, vec4(0.0f, 1.0f, 0.0f));
-		if (is_key_press['q'])
-			camera.rotate(-rotate_speed, vec4(0.0f, 1.0f, 0.0f));
-		if (is_key_press['r'])
-			camera.rotate(-rotate_speed, camera.get_right());
-		if (is_key_press['f'])
-			camera.rotate(rotate_speed, camera.get_right());
-		if (is_key_press['z'])
-			camera.zoom(5.0f);
-		if (is_key_press['x'])
-			camera.zoom(-5.0f);
-		if (is_key_press['g'])
-			camera.set_normal_zoom();
-	}
-	if (cur_focus == f_point)
-	{
-		if (is_key_press['w'])
-			point_lights[0].move(vec4(0.0f, 0.0f, 1.0f * move_speed));
-		if (is_key_press['s'])
-			point_lights[0].move(vec4(0.0f, 0.0f, 1.0f * -move_speed));
-		if (is_key_press['d'])
-			point_lights[0].move(vec4(1.0f * -move_speed, 0.0f, 0.0f));
-		if (is_key_press['a'])
-			point_lights[0].move(vec4(1.0f * move_speed, 0.0f, 0.0f));
-		if (is_key_press[' '])
-			point_lights[0].move(vec4(0.0f, 1.0f * move_speed, 0.0f));
-		if (is_key_press['c'])
-			point_lights[0].move(vec4(0.0f, -1.0f * move_speed, 0.0f));
-		if (is_key_press['j'])
-			point_lights[0].change_color(vec4(1.0f * color_speed, 0.0f, 0.0f));
-		if (is_key_press['m'])
-			point_lights[0].change_color(vec4(1.0f * -color_speed, 0.0f, 0.0f));
-		if (is_key_press['k'])
-			point_lights[0].change_color(vec4(0.0f, 1.0f * color_speed, 0.0f));
-		if (is_key_press[','])
-			point_lights[0].change_color(vec4(0.0f, 1.0f * -color_speed, 0.0f));
-		if (is_key_press['l'])
-			point_lights[0].change_color(vec4(0.0f, 0.0f, 1.0f * color_speed));
-		if (is_key_press['.'])
-			point_lights[0].change_color(vec4(0.0f, 0.0f, 1.0f * -color_speed));
+		case (f_camera):
+		{
+			camera.key_press(is_key_press);
+			break;
+		}
+		case (f_point):
+		{
+			point_lights[cur_point_light].key_press(is_key_press, camera);
+			break;
+		}
+		case (f_spot):
+		{
+			spot_lights[cur_spot_light].key_press(is_key_press, camera);
+			break;
+		}
+		case (f_dir):
+		{
+			dir_lights[cur_dir_light].key_press(is_key_press, camera);
+			break;
+		}
 	}
 	glutPostRedisplay();
 	glutTimerFunc(40, timer, 0);
@@ -316,6 +353,25 @@ string get_game_mode_string()
 	stringstream s;
 	s << win_width << "x" << win_height << ":" << 32;
 	return s.str();
+}
+
+void set_lights(GLuint program)
+{
+	glUniform1i(glGetUniformLocation(program, "count_point_lights"), point_lights.size());
+	glUniform1i(glGetUniformLocation(program, "count_dir_lights"), dir_lights.size());
+	glUniform1i(glGetUniformLocation(program, "count_spot_lights"), spot_lights.size());
+	for (int i = 0; i < spot_lights.size(); ++i)
+	{
+		spot_lights[i].set(program, i);
+	}
+	for (int i = 0; i < dir_lights.size(); ++i)
+	{
+		dir_lights[i].set(program, i);
+	}
+	for (int i = 0; i < point_lights.size(); ++i)
+	{
+		point_lights[i].set(program, i);
+	}
 }
 
 void render()
@@ -334,9 +390,7 @@ void render()
 	glUniform3f(glGetUniformLocation(main_program, "material.diffuse"), 0.4f, 0.4f, 0.4f);
 	glUniform3f(glGetUniformLocation(main_program, "material.specular"), 0.774597f, 0.774597f, 0.774597f);
 
-	point_lights[0].set(main_program, 0);
-	spot_lights[0].set(main_program, 0);
-	dir_lights[0].set(main_program, 0);
+	set_lights(main_program);
 
 	GLint model_loc = glGetUniformLocation(main_program, "model");
 	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
@@ -376,8 +430,8 @@ void render()
 void init_lights()
 {
 	point_lights.push_back(Point_Light(vec4(10.0f, 20.0f, 5.0f), vec4(1.0f, 1.0f, 1.0f), 1.0f, 0.027f, 0.0028f));
-	spot_lights.push_back(Spot_Light(vec4(40.0f, 10.0f, 15.0f), vec4(1.0f, -1.0, 0.0f), vec4(1.0f, 0.0f, 0.0f), cosf(PI / 180 * 25.0f), 1.0f, 0.027f, 0.0028f));
-	dir_lights.push_back(Dir_Light(vec4(0.0f, -1.0f, 0.0f), vec4(0.2f, 0.2f, 0.2f)));
+	spot_lights.push_back(Spot_Light(vec4(40.0f, 10.0f, 15.0f), vec4(0.0f, -1.0, 0.0f), vec4(0.0f, 0.0f, -1.0f), vec4(1.0f, 0.0f, 0.0f), cosf(PI / 180.0f * 25.0f), 1.0f, 0.027f, 0.0028f));
+	dir_lights.push_back(Dir_Light(vec4(0.0f, -1.0f, 0.0f), vec4(0.0f, 0.0f, 1.0f), vec4(0.2f, 0.2f, 0.2f)));
 }
 
 int main(int argc, char *argv[])

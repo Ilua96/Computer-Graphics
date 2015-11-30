@@ -56,6 +56,38 @@ void Camera::set_normal_zoom()
 	fovy = normal_fovy;
 }
 
+void Camera::key_press(bool is_key_press[128])
+{
+	const float rotate_speed = 3.0f;
+	const float move_speed = 1.0f;
+	if (is_key_press['w'])
+		move(vec4(get_dir().x, 0.0f, get_dir().z).normalize() * -move_speed);
+	if (is_key_press['s'])
+		move(vec4(get_dir().x, 0.0f, get_dir().z).normalize() * move_speed);
+	if (is_key_press['d'])
+		move(get_right() * move_speed);
+	if (is_key_press['a'])
+		move(get_right() * -move_speed);
+	if (is_key_press[' '])
+		move(vec4(0.0f, 1.0f * move_speed, 0.0f));
+	if (is_key_press['c'])
+		move(vec4(0.0f, -1.0f * move_speed, 0.0f));
+	if (is_key_press['e'])
+		rotate(rotate_speed, vec4(0.0f, 1.0f, 0.0f));
+	if (is_key_press['q'])
+		rotate(-rotate_speed, vec4(0.0f, 1.0f, 0.0f));
+	if (is_key_press['r'])
+		rotate(-rotate_speed, get_right());
+	if (is_key_press['f'])
+		rotate(rotate_speed, get_right());
+	if (is_key_press['z'])
+		zoom(5.0f);
+	if (is_key_press['x'])
+		zoom(-5.0f);
+	if (is_key_press['g'])
+		set_normal_zoom();
+}
+
 mat4 Camera::get_mat()
 {
 	mat4 projection, view;
@@ -69,7 +101,6 @@ mat4 Camera::get_mat()
 		projection = projection.orthographic(left, right_fur, bottom, top, near_plane, far_plane);
 	}
 	view = mat4(right.x, right.y, right.z, 0, up.x, up.y, up.z, 0, dir.x, dir.y, dir.z, 0, 0, 0, 0, 1) * mat4(1, 0, 0, -pos.x, 0, 1, 0, -pos.y, 0, 0, 1, -pos.z, 0, 0, 0, 1);
-	//cout << projection.str() << endl;
 	return projection * view;
 }
 

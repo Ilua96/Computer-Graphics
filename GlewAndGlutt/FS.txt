@@ -1,6 +1,6 @@
-#define COUNT_POINT_LIGHTS 1
-#define COUNT_DIR_LIGHTS 1
-#define COUNT_SPOT_LIGHTS 1
+#define MAX_POINT_LIGHTS 10
+#define MAX_DIR_LIGHTS 10
+#define MAX_SPOT_LIGHTS 10
 
 struct Material {
     vec3 ambient;
@@ -38,9 +38,12 @@ in vec3 Normal;
 uniform vec3 view_pos;
 
 uniform Material material;
-uniform Point_Light point_lights[COUNT_POINT_LIGHTS];
-uniform Spot_Light spot_lights[COUNT_SPOT_LIGHTS];
-uniform Dir_Light dir_lights[COUNT_DIR_LIGHTS];
+uniform int count_point_lights; 
+uniform int count_dir_lights;
+uniform int count_spot_lights; 
+uniform Point_Light point_lights[MAX_POINT_LIGHTS];
+uniform Spot_Light spot_lights[MAX_SPOT_LIGHTS];
+uniform Dir_Light dir_lights[MAX_DIR_LIGHTS];
 
 vec3 point_light(Point_Light light)
 {
@@ -104,15 +107,15 @@ vec3 dir_light(Dir_Light light)
 void main(void)
 {
 	vec3 ans = vec3(0.0f, 0.0f, 0.0f);
-	for (int i = 0; i < COUNT_POINT_LIGHTS; ++i)
+	for (int i = 0; i < count_point_lights; ++i)
 	{
 		ans += point_light(point_lights[i]);
 	}
-	for (int i = 0; i < COUNT_SPOT_LIGHTS; ++i)
+	for (int i = 0; i < count_spot_lights; ++i)
 	{
 		ans += spot_light(spot_lights[i]);
 	}
-	for (int i = 0; i < COUNT_DIR_LIGHTS; ++i)
+	for (int i = 0; i < count_dir_lights; ++i)
 	{
 		ans += dir_light(dir_lights[i]);
 	}
