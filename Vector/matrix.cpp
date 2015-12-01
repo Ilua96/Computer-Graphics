@@ -1,8 +1,8 @@
+#define _USE_MATH_DEFINES
 #include "vector_matrix.h"
 #include <iostream>
 #include <sstream>
-#include <cmath>
-#define PI 3.14159265
+#include <math.h>
 
 mat4::mat4(float X1, float Y1, float Z1, float W1, float X2, float Y2, float Z2, float W2, 
 	float X3, float Y3, float Z3, float W3, float X4, float Y4, float Z4, float W4)
@@ -207,7 +207,7 @@ mat4 mat4::scale(vec4 & vec)
 
 mat4 mat4::rotate(float angle,vec4 axis)
 {
-	angle = PI / 180 * angle;
+	angle = M_PI / 180 * angle;
 	axis.normalize_in_place();
 	float c = cos(angle);
 	float mc = 1 - c;
@@ -231,7 +231,7 @@ mat4 mat4::translate(vec4 & vec)
 
 mat4 mat4::perspective(float fovy, float aspect, float near, float far)
 {
-	fovy = PI / 180 * fovy;
+	fovy = M_PI / 180 * fovy;
 	float left, right, bottom, top;
 	top = near * tan(fovy / 2);
 	bottom = -top;

@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <glew.h>
 #include <freeglut.h>
 #include <stdio.h>
@@ -12,7 +13,7 @@
 #include <vector>
 #include <mesh.h>
 #include <model.h>
-#define PI 3.14159265
+#include <math.h>
 
 GLuint main_program;
 GLuint light_program;
@@ -23,13 +24,12 @@ GLuint mvp_location;
 int win_width = 1920;
 int win_height = 1080;
 Mesh plane;
-Model test_model;
+Model mi28_model, sphere_model, crate_model;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
 //Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
 enum focus {f_camera, f_point, f_dir, f_spot, f_ambient} cur_focus;
 
-const int count_cube_vertices = 36;//806;
-//float vertices[count_vertices * 3]; 
+const int count_cube_vertices = 36;
 float cube_vertices[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 	0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -80,62 +80,7 @@ vector <Vertex> plane_vertices = {
 	Vertex(vec4(100.0f,  0.0f,  100.0f),  vec4(0.0f,  1.0f,  0.0f)),
 	Vertex(vec4(100.0f,  0.0f, -100.0f),  vec4(0.0f,  1.0f,  0.0f)),
 };
-
-float plane_vertices_f[] = {
-	-100.0f,  0.0f, -100.0f,  0.0f,  1.0f,  0.0f,
-	-100.0f,  0.0f, 100.0f,  0.0f,  1.0f,  0.0f,
-	100.0f,  0.0f,  100.0f,  0.0f,  1.0f,  0.0f,
-	-100.0f,  0.0f,  -100.0f,  0.0f,  1.0f,  0.0f,
-	100.0f,  0.0f,  100.0f,  0.0f,  1.0f,  0.0f,
-	100.0f,  0.0f, -100.0f,  0.0f,  1.0f,  0.0f
-};
-
 vector <GLuint> plane_ind = { 0, 1, 2, 0, 2, 3 };
-
-
-//float vertices[count_vertices * 3] = {
-//	-0.5f, -0.5f, -0.5f,
-//	0.5f, -0.5f, -0.5f,
-//	0.5f,  0.5f, -0.5f,
-//	0.5f,  0.5f, -0.5f,
-//	-0.5f,  0.5f, -0.5f,
-//	-0.5f, -0.5f, -0.5f,
-//
-//	-0.5f, -0.5f,  0.5f,
-//	0.5f, -0.5f,  0.5f,
-//	0.5f,  0.5f,  0.5f,
-//	0.5f,  0.5f,  0.5f,
-//	-0.5f,  0.5f,  0.5f,
-//	-0.5f, -0.5f,  0.5f,
-//
-//	-0.5f,  0.5f,  0.5f,
-//	-0.5f,  0.5f, -0.5f,
-//	-0.5f, -0.5f, -0.5f,
-//	-0.5f, -0.5f, -0.5f,
-//	-0.5f, -0.5f,  0.5f,
-//	-0.5f,  0.5f,  0.5f,
-//
-//	0.5f,  0.5f,  0.5f,
-//	0.5f,  0.5f, -0.5f,
-//	0.5f, -0.5f, -0.5f,
-//	0.5f, -0.5f, -0.5f,
-//	0.5f, -0.5f,  0.5f,
-//	0.5f,  0.5f,  0.5f,
-//
-//	-0.5f, -0.5f, -0.5f,
-//	0.5f, -0.5f, -0.5f,
-//	0.5f, -0.5f,  0.5f,
-//	0.5f, -0.5f,  0.5f,
-//	-0.5f, -0.5f,  0.5f,
-//	-0.5f, -0.5f, -0.5f,
-//
-//	-0.5f,  0.5f, -0.5f,
-//	0.5f,  0.5f, -0.5f,
-//	0.5f,  0.5f,  0.5f,
-//	0.5f,  0.5f,  0.5f,
-//	-0.5f,  0.5f,  0.5f,
-//	-0.5f,  0.5f, -0.5f
-//};
 
 void add_vertex(int i, float x, float y, float z)
 {
@@ -170,7 +115,7 @@ void press_keys(unsigned char key, int x, int y)
 				if (spot_lights.size() < 10)
 				{
 					spot_lights.push_back(Spot_Light(vec4(0.0f, 20.0f, 0.0f), vec4(0.0f, -1.0, 0.0f),
-						vec4(0.0f, 0.0f, -1.0f), vec4(1.0f, 1.0f, 1.0f), cosf(PI / 180.0f * 25.0f), 1.0f, 0.027f, 0.0028f));
+						vec4(0.0f, 0.0f, -1.0f), vec4(1.0f, 1.0f, 1.0f), cosf(M_PI / 180.0f * 25.0f), 1.0f, 0.027f, 0.0028f));
 					cur_spot_light = spot_lights.size() - 1;
 				}
 			}
@@ -179,7 +124,7 @@ void press_keys(unsigned char key, int x, int y)
 				if (spot_lights.size() > 1)
 				{
 					spot_lights.erase(spot_lights.begin() + cur_spot_light);
-					--cur_spot_light;
+					cur_spot_light = 0;
 				}
 			}
 			if (is_key_press['y'])
@@ -201,7 +146,7 @@ void press_keys(unsigned char key, int x, int y)
 				if (point_lights.size() > 1)
 				{
 					point_lights.erase(point_lights.begin() + cur_point_light);
-					--cur_point_light;
+					cur_point_light = 0;
 				}
 			}
 			if (is_key_press['y'])
@@ -223,7 +168,7 @@ void press_keys(unsigned char key, int x, int y)
 				if (dir_lights.size() > 1)
 				{
 					dir_lights.erase(dir_lights.begin() + cur_dir_light);
-					--cur_dir_light;
+					cur_dir_light = 0;
 				}
 			}
 			if (is_key_press['y'])
@@ -395,8 +340,7 @@ void render()
 
 	glUseProgram(main_program);
 	mvp_location = glGetUniformLocation(light_program, "mvp");
-	model = model.translate(vec4(0.0f, 5.0f, 0.0f)) * model.scale(vec4(10.0f, 10.0f, 10.0f));
-	mvp = camera.get_mat() * model;
+	GLint model_loc = glGetUniformLocation(main_program, "model");
 	glUniform3f(glGetUniformLocation(main_program, "view_pos"), camera.get_pos().x, camera.get_pos().y, camera.get_pos().z);
 	glUniform1f(glGetUniformLocation(main_program, "material.shininess"), 64.0f);
 	glUniform3f(glGetUniformLocation(main_program, "material.ambient"), 0.25f, 0.25f, 0.25f);
@@ -405,37 +349,27 @@ void render()
 
 	set_lights(main_program);
 
-	GLint model_loc = glGetUniformLocation(main_program, "model");
-	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
-	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, count_cube_vertices);
-	glBindVertexArray(0);
-
-	//Mesh plane(plane_vertices, plane_ind);
 	mvp = camera.get_mat();
 	model.identity();
-	model = model.translate(vec4(40.0f, 0.0f, 40.0f)) *  model.scale(vec4(0.2f, 0.2f, 0.2f));
-	mvp = mvp * model;
-	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
-
-	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
-	test_model.draw(main_program);
+	model = model.translate(vec4(50.0f, 15.0f, 10.0f)) * model.scale(vec4(0.05f, 0.05f, 0.05f));
+	mi28_model.draw(mvp_location, model_loc, mvp, model);
 	
 	mvp = camera.get_mat();
 	model.identity();
+	plane.draw(mvp_location, model_loc, mvp, model);
+
+	mvp = camera.get_mat();
+	model.identity();
+	model = model.scale(vec4(0.1f, 0.1f, 0.1f));
+	sphere_model.draw(mvp_location, model_loc, mvp, model);
+	
+	mvp = camera.get_mat();
+	model.identity();
+	model = model.translate(vec4(10.0f, 5.0f, 50.0f)) * model.scale(vec4(5.0f, 5.0f, 5.0f));
 	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
 	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
-	plane.draw(main_program);
+	crate_model.draw(mvp_location, model_loc, mvp, model);
 
-	//glBindVertexArray(plane_VAO);
-	//mvp = camera.get_mat();
-	//glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
-	//model.identity();
-	//glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
-	//glBindVertexArray(0);
-	
 	glUseProgram(0);
 
 	glUseProgram(light_program);
@@ -459,7 +393,8 @@ void render()
 void init_lights()
 {
 	point_lights.push_back(Point_Light(vec4(10.0f, 20.0f, 5.0f), vec4(1.0f, 1.0f, 1.0f), 1.0f, 0.027f, 0.0028f));
-	spot_lights.push_back(Spot_Light(vec4(40.0f, 10.0f, 15.0f), vec4(0.0f, -1.0, 0.0f), vec4(0.0f, 0.0f, -1.0f), vec4(1.0f, 0.0f, 0.0f), cosf(PI / 180.0f * 25.0f), 1.0f, 0.027f, 0.0028f));
+	spot_lights.push_back(Spot_Light(vec4(40.0f, 10.0f, 15.0f), vec4(0.0f, -1.0, 0.0f), vec4(0.0f, 0.0f, -1.0f),
+		vec4(1.0f, 0.0f, 0.0f), cosf(M_PI / 180.0f * 25.0f), 1.0f, 0.027f, 0.0028f));
 	dir_lights.push_back(Dir_Light(vec4(0.0f, -1.0f, 0.0f), vec4(0.0f, 0.0f, 1.0f), vec4(0.2f, 0.2f, 0.2f)));
 }
 
@@ -471,12 +406,9 @@ int main(int argc, char *argv[])
 	camera.look_at(vec4(5.0f, 5.0f, -25.0f),
 				   vec4(0.0f, 0.0f, 0.0f),
 				   vec4(0.0f, 1.0f, 0.0f));
-	//camera.get_mat();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutGameModeString(get_game_mode_string().c_str());
-	//glutCreateWindow("adsf");
-	//glutShowWindow();
 	glutEnterGameMode();
 	glutSetCursor(GLUT_CURSOR_NONE);
 	glutWarpPointer(win_width / 2, win_height / 2);
@@ -493,12 +425,11 @@ int main(int argc, char *argv[])
 	glClearColor(0.12f, 0.34f, 0.35f, 0.0f);
 	main_program = create_program("VS.txt", "FS.txt");
 	light_program = create_program("VS_light.txt", "FS_light.txt");
-	glGenVertexArrays(1, &VAO);
 
+	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sizeof(cube_vertices), &cube_vertices, GL_STATIC_DRAW);
-
 	glBindVertexArray(VAO);
 	attr_location = glGetAttribLocation(main_program, "position");
 	glVertexAttribPointer(attr_location, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
@@ -508,22 +439,10 @@ int main(int argc, char *argv[])
 	glEnableVertexAttribArray(attr_location);
 	glBindVertexArray(0);
 
-	//test_model = Model("nanosuit2.obj");
-	test_model = Model("soccer ball.obj"); 
-	//test_model = Model("havoc.obj");
-
+	sphere_model = Model("sphere.obj");
+	crate_model = Model("crate.obj");
+	mi28_model = Model("havoc.obj");
 	plane = Mesh(plane_vertices, plane_ind);
-	glGenVertexArrays(1, &plane_VAO);
-	glGenBuffers(1, &plane_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 36, plane_vertices_f, GL_STATIC_DRAW);
-	glBindVertexArray(plane_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glBindVertexArray(0);
 
 	glutDisplayFunc(render);
 	glutKeyboardFunc(press_keys);

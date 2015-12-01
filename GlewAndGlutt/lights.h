@@ -8,6 +8,7 @@
 #include <sstream>
 #include <vector_matrix.h>
 #include <camera.h>
+#include <model.h>
 class Material {
 	public:
 		vec4 ambient;
@@ -61,7 +62,6 @@ class Spot_Light: public Point_Light, public Dir_Light{
 		Spot_Light(vec4 pos, vec4 dir, vec4 up, vec4 color, float cutoff, float constant, float linear, float quadr);
 		void set(GLuint program, int index);
 		void key_press(bool is_key_press[128], Camera camera);
-		friend void key_press_once(bool is_key_press[128], Camera camera);
 };
 
 static vector <Dir_Light> dir_lights;

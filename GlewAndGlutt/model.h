@@ -16,21 +16,9 @@ class Model
 		Model() {};
 		Model(string path)
 		{
-			load_model(path);
-		}
-	
-		void draw(GLuint program)
-		{
-			for (int i = 0; i < meshes.size(); ++i)
-				meshes[i].draw(program);
-		}
-	
-	private:
-		void load_model(string path)
-		{
 			Assimp::Importer importer;
 			const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_SplitLargeMeshes);
-			if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
+			if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 			{
 				std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
 				return;
@@ -38,6 +26,13 @@ class Model
 			process_node(scene->mRootNode, scene);
 		}
 	
+		void draw(GLuint mvp_loc, GLuint model_loc, mat4 &mvp, mat4 &model)
+		{
+			for (int i = 0; i < meshes.size(); ++i)
+				meshes[i].draw(mvp_loc, model_loc, mvp, model);
+		}
+	
+	private:	
 		void process_node(aiNode* node, const aiScene* scene)
 		{
 			for (GLuint i = 0; i < node->mNumMeshes; ++i)
@@ -56,6 +51,7 @@ class Model
 		{
 			vector <Vertex> vertices;
 			vector <GLuint> indices;
+			cout << mesh->mNumVertices << endl << flush;
 			for (GLuint i = 0; i < mesh->mNumVertices; ++i)
 			{
 				Vertex vertex;

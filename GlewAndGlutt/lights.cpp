@@ -1,7 +1,9 @@
+#define _USE_MATH_DEFINES
 #include "lights.h"
 #include "camera.h"
 #include <iostream>
-#define PI 3.14159265
+#include <math.h>
+#include <model.h>
 
 Spot_Light::Spot_Light(vec4 pos, vec4 dir, vec4 up, vec4 color, float cutoff, float constant, float linear, float quadr) :
 	Point_Light(pos, color, constant, linear, quadr), Dir_Light(dir, up, color), Ambient_Light(color), cutoff(cutoff)

@@ -4,7 +4,6 @@
 #include <vector_matrix.h>
 
 struct Vertex {
-	//float pos_x, pos_y, pos_z, nor_x, nor_y, nor_z;
 	vec4 pos;
 	vec4 normal;
 	Vertex(vec4 pos, vec4 normal) : pos(pos), normal(normal) {}
@@ -20,19 +19,6 @@ class Mesh {
 		{
 			vertices = Vertices;
 			indices = Indices;
-			setup();
-		}
-		void draw(GLuint program)
-		{
-			glBindVertexArray(VAO);
-			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-		}
-
-	private:
-		GLuint VAO, VBO, EBO;
-		void setup()
-		{
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
@@ -48,7 +34,18 @@ class Mesh {
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(4 * sizeof(float)));
-		
+
 			glBindVertexArray(0);
 		}
+		void draw(GLuint mvp_loc, GLuint model_loc, mat4 &mvp, mat4 &model)
+		{
+			glBindVertexArray(VAO);
+			glUniformMatrix4fv(mvp_loc, 1, GL_TRUE, *((mvp * model).matrix));
+			glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
+			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+		}
+
+	private:
+		GLuint VAO, VBO, EBO;
 };
