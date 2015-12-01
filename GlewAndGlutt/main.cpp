@@ -10,6 +10,7 @@
 #include <sstream>
 #include <lights.h>
 #include <vector>
+#include <mesh.h>
 #define PI 3.14159265
 
 GLuint main_program;
@@ -20,6 +21,7 @@ GLuint attr_location;
 GLuint mvp_location;
 int win_width = 1920;
 int win_height = 1080;
+Mesh plane;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
 //Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
 enum focus {f_camera, f_point, f_dir, f_spot, f_ambient} cur_focus;
@@ -70,15 +72,15 @@ float cube_vertices[] = {
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
-const int count_plane_vertices = 6;
-float plane_vertices[] = {
+vector <float> plane_vertices = {
 	-100.0f,  0.0f, -100.0f,  0.0f,  1.0f,  0.0f,
 	-100.0f,  0.0f, 100.0f,  0.0f,  1.0f,  0.0f,
 	100.0f,  0.0f,  100.0f,  0.0f,  1.0f,  0.0f,
-	-100.0f,  0.0f,  -100.0f,  0.0f,  1.0f,  0.0f,
-	100.0f,  0.0f,  100.0f,  0.0f,  1.0f,  0.0f,
 	100.0f,  0.0f, -100.0f,  0.0f,  1.0f,  0.0f
 };
+
+vector <GLuint> plane_ind = { 0, 1, 2, 0, 2, 3 };
+
 
 //float vertices[count_vertices * 3] = {
 //	-0.5f, -0.5f, -0.5f,
@@ -399,13 +401,20 @@ void render()
 	glDrawArrays(GL_TRIANGLES, 0, count_cube_vertices);
 	glBindVertexArray(0);
 
-	glBindVertexArray(plane_VAO);
+	//Mesh plane(plane_vertices, plane_ind);
 	mvp = camera.get_mat();
 	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
 	model.identity();
 	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
-	glDrawArrays(GL_TRIANGLES, 0, count_plane_vertices);
-	glBindVertexArray(0);
+	plane.draw(main_program);
+
+	//glBindVertexArray(plane_VAO);
+	//mvp = camera.get_mat();
+	//glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
+	//model.identity();
+	//glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
+	//glDrawArrays(GL_TRIANGLES, 0, count_plane_vertices);
+	//glBindVertexArray(0);
 	
 	glUseProgram(0);
 
@@ -446,6 +455,8 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutGameModeString(get_game_mode_string().c_str());
+	//glutCreateWindow("adsf");
+	//glutShowWindow();
 	glutEnterGameMode();
 	glutSetCursor(GLUT_CURSOR_NONE);
 	glutWarpPointer(win_width / 2, win_height / 2);
@@ -477,21 +488,18 @@ int main(int argc, char *argv[])
 	glEnableVertexAttribArray(attr_location);
 	glBindVertexArray(0);
 
-	glGenVertexArrays(1, &plane_VAO);
-	glGenBuffers(1, &plane_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sizeof(plane_vertices), &plane_vertices, GL_STATIC_DRAW);
-	glBindVertexArray(plane_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
-	attr_location = glGetAttribLocation(main_program, "position");
-	glVertexAttribPointer(attr_location, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
-	glEnableVertexAttribArray(attr_location);
-	attr_location = glGetAttribLocation(main_program, "normal");
-	glVertexAttribPointer(attr_location, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(attr_location);
-	glEnableVertexAttribArray(0);
-	glBindVertexArray(0);
+	plane = Mesh(plane_vertices, plane_ind);
+	//glGenVertexArrays(1, &plane_VAO);
+	//glGenBuffers(1, &plane_VBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * plane_vertices.size(), &plane_vertices[0], GL_STATIC_DRAW);
+	//glBindVertexArray(plane_VAO);
+	//glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
+	//glBindVertexArray(0);
 
 	glutDisplayFunc(render);
 	glutKeyboardFunc(press_keys);
