@@ -22,7 +22,7 @@ GLuint attr_location;
 GLuint mvp_location;
 int win_width = 1920;
 int win_height = 1080;
-//Mesh plane;
+Mesh plane;
 Model test_model;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
 //Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
@@ -74,9 +74,18 @@ float cube_vertices[] = {
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
-vector <float> plane_vertices = {
+vector <Vertex> plane_vertices = {
+	Vertex(vec4(-100.0f,  0.0f, -100.0f),  vec4(0.0f,  1.0f,  0.0f)),
+	Vertex(vec4(-100.0f,  0.0f, 100.0f),  vec4(0.0f,  1.0f,  0.0f)),
+	Vertex(vec4(100.0f,  0.0f,  100.0f),  vec4(0.0f,  1.0f,  0.0f)),
+	Vertex(vec4(100.0f,  0.0f, -100.0f),  vec4(0.0f,  1.0f,  0.0f)),
+};
+
+float plane_vertices_f[] = {
 	-100.0f,  0.0f, -100.0f,  0.0f,  1.0f,  0.0f,
 	-100.0f,  0.0f, 100.0f,  0.0f,  1.0f,  0.0f,
+	100.0f,  0.0f,  100.0f,  0.0f,  1.0f,  0.0f,
+	-100.0f,  0.0f,  -100.0f,  0.0f,  1.0f,  0.0f,
 	100.0f,  0.0f,  100.0f,  0.0f,  1.0f,  0.0f,
 	100.0f,  0.0f, -100.0f,  0.0f,  1.0f,  0.0f
 };
@@ -412,14 +421,19 @@ void render()
 
 	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
 	test_model.draw(main_program);
-	//plane.draw(main_program);
+	
+	mvp = camera.get_mat();
+	model.identity();
+	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
+	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
+	plane.draw(main_program);
 
 	//glBindVertexArray(plane_VAO);
 	//mvp = camera.get_mat();
 	//glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
 	//model.identity();
 	//glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
-	//glDrawArrays(GL_TRIANGLES, 0, count_plane_vertices);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
 	//glBindVertexArray(0);
 	
 	glUseProgram(0);
@@ -498,18 +512,18 @@ int main(int argc, char *argv[])
 	test_model = Model("soccer ball.obj"); 
 	//test_model = Model("havoc.obj");
 
-	//plane = Mesh(plane_vertices, plane_ind);
-	//glGenVertexArrays(1, &plane_VAO);
-	//glGenBuffers(1, &plane_VBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * plane_vertices.size(), &plane_vertices[0], GL_STATIC_DRAW);
-	//glBindVertexArray(plane_VAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-	//glBindVertexArray(0);
+	plane = Mesh(plane_vertices, plane_ind);
+	glGenVertexArrays(1, &plane_VAO);
+	glGenBuffers(1, &plane_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 36, plane_vertices_f, GL_STATIC_DRAW);
+	glBindVertexArray(plane_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glBindVertexArray(0);
 
 	glutDisplayFunc(render);
 	glutKeyboardFunc(press_keys);

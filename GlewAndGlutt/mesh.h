@@ -7,6 +7,8 @@ struct Vertex {
 	//float pos_x, pos_y, pos_z, nor_x, nor_y, nor_z;
 	vec4 pos;
 	vec4 normal;
+	Vertex(vec4 pos, vec4 normal) : pos(pos), normal(normal) {}
+	Vertex() {};
 };
 
 class Mesh {
@@ -45,7 +47,7 @@ class Mesh {
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
 			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(4 * sizeof(float)));
 		
 			glBindVertexArray(0);
 		}
