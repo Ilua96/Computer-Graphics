@@ -11,6 +11,7 @@
 #include <lights.h>
 #include <vector>
 #include <mesh.h>
+#include <model.h>
 #define PI 3.14159265
 
 GLuint main_program;
@@ -21,7 +22,8 @@ GLuint attr_location;
 GLuint mvp_location;
 int win_width = 1920;
 int win_height = 1080;
-Mesh plane;
+//Mesh plane;
+Model test_model;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
 //Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
 enum focus {f_camera, f_point, f_dir, f_spot, f_ambient} cur_focus;
@@ -403,10 +405,14 @@ void render()
 
 	//Mesh plane(plane_vertices, plane_ind);
 	mvp = camera.get_mat();
-	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
 	model.identity();
+	model = model.translate(vec4(40.0f, 0.0f, 40.0f)) *  model.scale(vec4(0.2f, 0.2f, 0.2f));
+	mvp = mvp * model;
+	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
+
 	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
-	plane.draw(main_program);
+	test_model.draw(main_program);
+	//plane.draw(main_program);
 
 	//glBindVertexArray(plane_VAO);
 	//mvp = camera.get_mat();
@@ -488,7 +494,11 @@ int main(int argc, char *argv[])
 	glEnableVertexAttribArray(attr_location);
 	glBindVertexArray(0);
 
-	plane = Mesh(plane_vertices, plane_ind);
+	//test_model = Model("nanosuit2.obj");
+	test_model = Model("soccer ball.obj"); 
+	//test_model = Model("havoc.obj");
+
+	//plane = Mesh(plane_vertices, plane_ind);
 	//glGenVertexArrays(1, &plane_VAO);
 	//glGenBuffers(1, &plane_VBO);
 	//glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
