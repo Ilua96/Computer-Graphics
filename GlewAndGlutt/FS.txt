@@ -36,6 +36,7 @@ out vec4 color;
 in vec3 frag_pos;  
 in vec3 Normal;  
 in vec2 Tex_Coords;
+in mat3 TBN;
 
 uniform vec3 view_pos;
 uniform Material material;
@@ -45,8 +46,11 @@ uniform int count_spot_lights;
 uniform Point_Light point_lights[MAX_POINT_LIGHTS];
 uniform Spot_Light spot_lights[MAX_SPOT_LIGHTS];
 uniform Dir_Light dir_lights[MAX_DIR_LIGHTS];
+
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
+uniform sampler2D normal_map; 
+uniform bool is_normal_maping;
 
 vec3 norm;
 vec3 view_dir;
@@ -106,7 +110,14 @@ vec3 dir_light(Dir_Light light)
 
 void main(void)
 {
-	norm = normalize(Normal);
+	if (is_normal_maping)
+	{
+		norm = texture(normal_map, Tex_Coords).rgb;
+		norm = normalize(norm * 2.0 - 1.0);   
+		norm = normalize(TBN * norm);
+	} else {
+		norm = Normal;
+	}
 	view_dir = normalize(view_pos - frag_pos);
 	vec3 ans = vec3(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < count_point_lights; ++i)
@@ -121,6 +132,5 @@ void main(void)
 	{
 		ans += dir_light(dir_lights[i]);
 	}
-    color = vec4(texture(texture_diffuse1, Tex_Coords)) + vec4(ans, 1.0f);
-	//color = vec3(texture(texture_diffuse1, Tex_Coords));
+    color = vec4(ans, 1.0f);
 }

@@ -24,7 +24,7 @@ GLuint mvp_location;
 int win_width = 1920;
 int win_height = 1080;
 Mesh plane, cube;
-Model mi28_model, sphere_model, crate_model, crysis_model, floor_model;
+Model mi28_model, sphere_model, crate_model, crysis_model, floor_model, crate_withoutNP_model;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
 //Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
 enum focus {f_camera, f_point, f_dir, f_spot, f_ambient} cur_focus;
@@ -317,11 +317,6 @@ void render()
 	glUniform3f(glGetUniformLocation(main_program, "material.specular"), 0.774597f, 0.774597f, 0.774597f);
 
 	set_lights(main_program);
-
-	mvp = camera.get_mat();
-	model.identity();
-	model = model.translate(vec4(50.0f, 15.0f, 10.0f)) * model.scale(vec4(0.05f, 0.05f, 0.05f));
-	mi28_model.draw(main_program, mvp_location, model_loc, mvp, model);
 	
 	mvp = camera.get_mat();
 	model.identity();
@@ -337,15 +332,11 @@ void render()
 	model = model.translate(vec4(10.0f, 5.0f, 50.0f)) * model.scale(vec4(5.0f, 5.0f, 5.0f));
 	crate_model.draw(main_program, mvp_location, model_loc, mvp, model);
 
-	//mvp = camera.get_mat();
-	//model.identity();
-	//model = model.scale(vec4(0.1f, 0.1f, 0.1f));
-	//sphere_model.draw(main_program, mvp_location, model_loc, mvp, model);
-
-	//mvp = camera.get_mat();
-	//model.identity();
-	//model = model.translate(vec4(30.0f, 0.0f, 50.0f)) /* * model.scale(vec4(1.5f, 1.5f, 1.5f))*/ * model.rotate(90, vec4(1.0f, 0.0f, 0.0f));
-	//crysis_model.draw(main_program, mvp_location, model_loc, mvp, model);
+	
+	mvp = camera.get_mat();
+	model.identity();
+	model = model.translate(vec4(25.0f, 5.0f, 50.0f)) * model.scale(vec4(5.0f, 5.0f, 5.0f));
+	crate_withoutNP_model.draw(main_program, mvp_location, model_loc, mvp, model);
 
 	glUseProgram(0);
 
@@ -378,7 +369,6 @@ void init_lights()
 
 int main(int argc, char *argv[])
 {
-	//gen_grid
 	cur_focus = f_camera;
 	init_lights();
 	camera.look_at(vec4(5.0f, 5.0f, -25.0f),
@@ -418,15 +408,16 @@ int main(int argc, char *argv[])
 	glBindVertexArray(0);
 
 	sphere_model = Model("Models\\Moon\\moon.obj");
+	sphere_model.load_texture("moonmap2k.jpg", "", "NormalMap.png");
 	crate_model = Model("Models\\Crate\\crate1.obj");
-	floor_model = Model("Models\\Cobblestones\\CobbleStones2.obj");
-	crate_model.load_texture("Well Preserved Chesterfield - Color Map.png", "Well Preserved Chesterfield - Specular Map.png");
-	//mi28_model = Model("Models\\Mi-28\\havoc.obj");
-	//crysis_model = Model("Models\\Nanosuit\\nanosuit.blend");
-	//crysis_model = Model("Models\\Crate\\crate1.obj");
+	crate_model.load_texture("Well Preserved Chesterfield - Color Map.png", "Well Preserved Chesterfield - Specular Map.png", "Well Preserved Chesterfield - (Normal Map_2).png");
+	crate_withoutNP_model = Model("Models\\Crate\\crate1.obj");
+	crate_withoutNP_model.load_texture("Well Preserved Chesterfield - Color Map.png", "Well Preserved Chesterfield - Specular Map.png");
+	
+	
 	vector <Texture> textures;
 	plane = Mesh(plane_vertices, plane_ind, textures);
-	plane.load_texture("Models\\Plane", "Medievil Stonework - Color Map.png", "Medievil Stonework - Specular Map.png");
+	plane.load_texture("Models\\Plane", "Medievil Stonework - Color Map.png", "Medievil Stonework - Specular Map.png", "Medievil Stonework - (Normal Map).png");
 	cube = Mesh(cube_vertices, cube_ind, textures);
 
 	glutDisplayFunc(render);

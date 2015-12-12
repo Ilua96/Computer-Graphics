@@ -1,16 +1,23 @@
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;  
 layout (location = 2) in vec2 tex_coords;
+layout (location = 3) in vec3 tangent;
 
 uniform mat4 mvp; 
 uniform mat4 model;
 out vec3 Normal;
 out vec3 frag_pos;
 out vec2 Tex_Coords;
+out mat3 TBN;
+
 void main(void)
 {
 	gl_Position = mvp * vec4(position, 1.0); 
-	Normal = /*mat3(transpose(inverse(model))) *  */ normal; 
+	Normal = /*mat3(transpose(inverse(model))) * */  normal; 
 	frag_pos = vec3(model * vec4(position, 1.0f));
-	Tex_Coords = tex_coords;
+	Tex_Coords = vec2(tex_coords.x, 1.0f - tex_coords.y);
+	vec3 T = normalize(vec3(model * vec4(tangent,   0.0)));
+    vec3 N = normalize(vec3(model * vec4(normal,    0.0)));
+	vec3 B = cross(T, N);
+    TBN = mat3(T, B, N);
 }
