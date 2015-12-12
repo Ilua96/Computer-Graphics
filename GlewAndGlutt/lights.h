@@ -9,6 +9,9 @@
 #include <vector_matrix.h>
 #include <camera.h>
 #include <model.h>
+#include <mesh.h>
+#include <model.h>
+
 class Material {
 	public:
 		vec4 ambient;
@@ -51,7 +54,7 @@ class Point_Light: public virtual Ambient_Light {
 		float quadr;
 		Point_Light(vec4 pos, vec4 color, float constant, float linear, float quadr);
 		void set(GLuint program, int index);
-		void draw_light_source(Camera camera, GLuint mvp_loc, GLuint color_loc, int count_ver);
+		void draw_light_source(GLuint program, Mesh &source_mesh, Camera camera, GLuint color_loc, GLuint mvp_loc, GLuint model_loc);
 		void move(const vec4 &vec);
 		void key_press(bool is_key_press[128], Camera camera);
 };

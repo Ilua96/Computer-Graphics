@@ -44,15 +44,14 @@ void Point_Light::set(GLuint program, int index)
 	glUniform1f(glGetUniformLocation(program, ("point_lights[" + s_index.str() + "].quadr").c_str()), quadr);
 }
 
-void Point_Light::draw_light_source(Camera camera, GLuint mvp_loc, GLuint color_loc, int count_ver)
+void Point_Light::draw_light_source(GLuint program, Mesh &source_mesh, Camera camera, GLuint color_loc, GLuint mvp_loc, GLuint model_loc)
 {
 	mat4 model, mvp;
 	model.identity();
 	model = model.translate(pos);
-	mvp = camera.get_mat() * model;
-	glUniformMatrix4fv(mvp_loc, 1, GL_TRUE, *(mvp.matrix));
+	mvp = camera.get_mat();
 	glUniform3f(color_loc, color.x, color.y, color.z);
-	glDrawArrays(GL_TRIANGLES, 0, count_ver);
+	source_mesh.draw(program, mvp_loc, model_loc, mvp, model);
 }
 
 void Point_Light::move(const vec4 & vec)

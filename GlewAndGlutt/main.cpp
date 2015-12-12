@@ -23,85 +23,54 @@ GLuint attr_location;
 GLuint mvp_location;
 int win_width = 1920;
 int win_height = 1080;
-Mesh plane;
-Model mi28_model, sphere_model, crate_model;
+Mesh plane, cube;
+Model mi28_model, sphere_model, crate_model, crysis_model, floor_model;
 Camera camera(70.0f, win_width, win_height, 0.1f, 500.0f);
 //Camera camera(-880.0f, 800.0f, -600.0f, 600.0f, 0.1f, 2000.0f);  
 enum focus {f_camera, f_point, f_dir, f_spot, f_ambient} cur_focus;
 
-const int count_cube_vertices = 36;
-float cube_vertices[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-	0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+vector <Vertex> cube_vertices = {
+	Vertex(vec4(-0.5f, -0.5f, -0.5f),  vec4(0.0f,  0.0f, -1.0f), 0.0f,  0.0f),
+	Vertex(vec4(0.5f, -0.5f, -0.5f),   vec4(0.0f,  0.0f, -1.0f), 0.0f,  0.0f),
+	Vertex(vec4(0.5f,  0.5f, -0.5f),   vec4(0.0f,  0.0f, -1.0f), 0.0f,  0.0f),
+	Vertex(vec4(-0.5f,  0.5f, -0.5f),  vec4(0.0f,  0.0f, -1.0f), 0.0f,  0.0f),
+														
+	Vertex(vec4(-0.5f, -0.5f,  0.5f),  vec4(0.0f,  0.0f, 1.0f) , 0.0f,  0.0f),
+	Vertex(vec4(0.5f, -0.5f,  0.5f),   vec4(0.0f,  0.0f, 1.0f) , 0.0f,  0.0f),
+	Vertex(vec4(0.5f,  0.5f,  0.5f),   vec4(0.0f,  0.0f, 1.0f) , 0.0f,  0.0f),
+	Vertex(vec4(-0.5f,  0.5f,  0.5f),  vec4(0.0f,  0.0f, 1.0f) , 0.0f,  0.0f),
+														
+	Vertex(vec4(-0.5f,  0.5f,  0.5f), vec4(-1.0f,  0.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(-0.5f,  0.5f, -0.5f), vec4(-1.0f,  0.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(-0.5f, -0.5f, -0.5f), vec4(-1.0f,  0.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(-0.5f, -0.5f,  0.5f), vec4(-1.0f,  0.0f,  0.0f), 0.0f,  0.0f),
+															
+	Vertex(vec4(0.5f,  0.5f,  0.5f),  vec4(1.0f,  0.0f,  0.0f) , 0.0f,  0.0f),
+	Vertex(vec4(0.5f,  0.5f, -0.5f),  vec4(1.0f,  0.0f,  0.0f) , 0.0f,  0.0f),
+	Vertex(vec4(0.5f, -0.5f, -0.5f),  vec4(1.0f,  0.0f,  0.0f) , 0.0f,  0.0f),
+	Vertex(vec4(0.5f, -0.5f,  0.5f),  vec4(1.0f,  0.0f,  0.0f) , 0.0f,  0.0f),
+														
+	Vertex(vec4(-0.5f, -0.5f, -0.5f),  vec4(0.0f, -1.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(0.5f, -0.5f, -0.5f),   vec4(0.0f, -1.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(0.5f, -0.5f,  0.5f),   vec4(0.0f, -1.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(-0.5f, -0.5f,  0.5f),  vec4(0.0f, -1.0f,  0.0f), 0.0f,  0.0f),
+															
+	Vertex(vec4(-0.5f,  0.5f, -0.5f),  vec4(0.0f,  1.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(0.5f,  0.5f, -0.5f),   vec4(0.0f,  1.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(0.5f,  0.5f,  0.5f),   vec4(0.0f,  1.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(-0.5f,  0.5f,  0.5f),  vec4(0.0f,  1.0f,  0.0f), 0.0f,  0.0f),
 };
+
+vector <GLuint> cube_ind = { 0, 1, 2, 2, 3, 0,   4, 5, 6, 6, 4, 7,   8, 9, 10, 10, 8, 11,  
+							 12, 13, 14, 14, 12, 15,  16, 17, 18, 18, 16, 19,   20, 21, 22, 22, 20, 23};
 
 vector <Vertex> plane_vertices = {
-	Vertex(vec4(-100.0f,  0.0f, -100.0f),  vec4(0.0f,  1.0f,  0.0f)),
-	Vertex(vec4(-100.0f,  0.0f, 100.0f),  vec4(0.0f,  1.0f,  0.0f)),
-	Vertex(vec4(100.0f,  0.0f,  100.0f),  vec4(0.0f,  1.0f,  0.0f)),
-	Vertex(vec4(100.0f,  0.0f, -100.0f),  vec4(0.0f,  1.0f,  0.0f)),
+	Vertex(vec4(-100.0f,  0.0f, -100.0f),  vec4(0.0f,  1.0f,  0.0f), 0.0f,  0.0f),
+	Vertex(vec4(-100.0f,  0.0f, 100.0f),  vec4(0.0f,  1.0f,  0.0f) , 10.0f,  0.0f),
+	Vertex(vec4(100.0f,  0.0f,  100.0f),  vec4(0.0f,  1.0f,  0.0f) , 10.0f,  10.0f),
+	Vertex(vec4(100.0f,  0.0f, -100.0f),  vec4(0.0f,  1.0f,  0.0f) , 10.0f,  0.0f),
 };
 vector <GLuint> plane_ind = { 0, 1, 2, 0, 2, 3 };
-
-void add_vertex(int i, float x, float y, float z)
-{
-	cube_vertices[3 * i] = x;
-	cube_vertices[3 * i + 1] = y;
-	cube_vertices[3 * i + 2] = z;
-};
-
-void gen_grid()
-{	
-	int j = 0;
-	for (int i = -1000; i <= 1000; i += 10, j += 4)
-	{
-		add_vertex(j, i, 0, -1000);
-		add_vertex(j + 1, i, 0, 1000);
-		add_vertex(j + 2, -1000, 0, i);
-		add_vertex(j + 3, 1000, 0, i);
-	}
-	add_vertex(j, 0, 0, 0);
-	add_vertex(j + 1, 0, 1000, 0);
-}
 
 bool is_key_press[128];
 void press_keys(unsigned char key, int x, int y)
@@ -352,37 +321,46 @@ void render()
 	mvp = camera.get_mat();
 	model.identity();
 	model = model.translate(vec4(50.0f, 15.0f, 10.0f)) * model.scale(vec4(0.05f, 0.05f, 0.05f));
-	mi28_model.draw(mvp_location, model_loc, mvp, model);
+	mi28_model.draw(main_program, mvp_location, model_loc, mvp, model);
 	
 	mvp = camera.get_mat();
 	model.identity();
-	plane.draw(mvp_location, model_loc, mvp, model);
+	plane.draw(main_program, mvp_location, model_loc, mvp, model);
 
 	mvp = camera.get_mat();
 	model.identity();
-	model = model.scale(vec4(0.1f, 0.1f, 0.1f));
-	sphere_model.draw(mvp_location, model_loc, mvp, model);
+	model = model.translate(vec4(0.0f, 10.0f, 0.0f)) *  model.scale(vec4(0.1f, 0.1f, 0.1f));
+	sphere_model.draw(main_program, mvp_location, model_loc, mvp, model);
 	
 	mvp = camera.get_mat();
 	model.identity();
 	model = model.translate(vec4(10.0f, 5.0f, 50.0f)) * model.scale(vec4(5.0f, 5.0f, 5.0f));
-	glUniformMatrix4fv(mvp_location, 1, GL_TRUE, *(mvp.matrix));
-	glUniformMatrix4fv(model_loc, 1, GL_TRUE, *(model.matrix));
-	crate_model.draw(mvp_location, model_loc, mvp, model);
+	crate_model.draw(main_program, mvp_location, model_loc, mvp, model);
+
+	//mvp = camera.get_mat();
+	//model.identity();
+	//model = model.scale(vec4(0.1f, 0.1f, 0.1f));
+	//sphere_model.draw(main_program, mvp_location, model_loc, mvp, model);
+
+	//mvp = camera.get_mat();
+	//model.identity();
+	//model = model.translate(vec4(30.0f, 0.0f, 50.0f)) /* * model.scale(vec4(1.5f, 1.5f, 1.5f))*/ * model.rotate(90, vec4(1.0f, 0.0f, 0.0f));
+	//crysis_model.draw(main_program, mvp_location, model_loc, mvp, model);
 
 	glUseProgram(0);
 
 	glUseProgram(light_program);
 	glBindVertexArray(VAO);
 	mvp_location = glGetUniformLocation(light_program, "mvp");
+	model_loc = glGetUniformLocation(light_program, "model");
 	GLuint light_color_loc = glGetUniformLocation(light_program, "light_color");
 	for (int i = 0; i < point_lights.size(); ++i)
 	{
-		point_lights[i].draw_light_source(camera, mvp_location, light_color_loc, count_cube_vertices);
+		point_lights[i].draw_light_source(light_program, cube, camera, light_color_loc, mvp_location, model_loc);
 	}
 	for (int i = 0; i < spot_lights.size(); ++i)
 	{
-		spot_lights[i].draw_light_source(camera, mvp_location, light_color_loc, count_cube_vertices);
+		spot_lights[i].draw_light_source(light_program, cube, camera, light_color_loc, mvp_location, model_loc);
 	}
 	glBindVertexArray(0);
 	glUseProgram(0);
@@ -439,10 +417,17 @@ int main(int argc, char *argv[])
 	glEnableVertexAttribArray(attr_location);
 	glBindVertexArray(0);
 
-	sphere_model = Model("sphere.obj");
-	crate_model = Model("crate.obj");
-	mi28_model = Model("havoc.obj");
-	plane = Mesh(plane_vertices, plane_ind);
+	sphere_model = Model("Models\\Moon\\moon.obj");
+	crate_model = Model("Models\\Crate\\crate1.obj");
+	floor_model = Model("Models\\Cobblestones\\CobbleStones2.obj");
+	crate_model.load_texture("Well Preserved Chesterfield - Color Map.png", "Well Preserved Chesterfield - Specular Map.png");
+	//mi28_model = Model("Models\\Mi-28\\havoc.obj");
+	//crysis_model = Model("Models\\Nanosuit\\nanosuit.blend");
+	//crysis_model = Model("Models\\Crate\\crate1.obj");
+	vector <Texture> textures;
+	plane = Mesh(plane_vertices, plane_ind, textures);
+	plane.load_texture("Models\\Plane", "Medievil Stonework - Color Map.png", "Medievil Stonework - Specular Map.png");
+	cube = Mesh(cube_vertices, cube_ind, textures);
 
 	glutDisplayFunc(render);
 	glutKeyboardFunc(press_keys);

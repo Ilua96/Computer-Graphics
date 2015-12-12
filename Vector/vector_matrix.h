@@ -1,5 +1,4 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#pragma once
 
 #include <string>
 using namespace std;
@@ -53,5 +52,3 @@ class mat4
 		string str();
 };
 
-
-#endif // VECTOR_H
